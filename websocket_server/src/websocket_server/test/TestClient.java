@@ -17,6 +17,7 @@ public class TestClient extends WebSocketClient {
 
 	private static final Logger sLogger = Logger.getLogger(TestClient.class.getName());
 	private int mMessageID = 0;
+	private int mSequenceNumber = 0;
 
 	public TestClient(URI uri) {
 		super(uri);
@@ -38,12 +39,20 @@ public class TestClient extends WebSocketClient {
 	@Override
 	public void onMessage(String message) {
 		sLogger.info("Received: " + message);
-		sLogger.info("Closing connection.");
-		try {
-			closeBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (mSequenceNumber == 0) {
+			++mSequenceNumber;
+			JSONObject req = generateOpenRestaurantRequest();
+			sLogger.info("Request: " + req);
+			send(req.toString());
+		}
+		else {
+			sLogger.info("Closing connection.");
+			try {
+				closeBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -51,15 +60,23 @@ public class TestClient extends WebSocketClient {
 	public void onOpen(ServerHandshake arg0) {
 		// TODO Auto-generated method stub
 		sLogger.info("Connected to server.\nRequesting open restaurants.");
-		JSONObject req = generateOpenRestaurantsRequest();
+		JSONObject req = generateOpenRestaurantsListRequest();
 		sLogger.info("Request: " + req);
 		send(req.toString());
 	}
 
-	private JSONObject generateOpenRestaurantsRequest() {
+	private JSONObject generateOpenRestaurantsListRequest() {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());
 		req.put("action", ServerAction.GET_OPEN_RESTAURANTS.getValue());
+		return req;
+	}
+
+	private JSONObject generateOpenRestaurantRequest() {
+		JSONObject req = new JSONObject();
+		req.put("id", getNewMessageID());
+		req.put("action", ServerAction.OPEN_RESTAURANT.getValue());
+		req.put("restaurant_id", 0);
 		return req;
 	}
 

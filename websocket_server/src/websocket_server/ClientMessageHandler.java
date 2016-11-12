@@ -16,6 +16,11 @@ public class ClientMessageHandler implements MessageHandler {
 	}
 
 	@Override
+	public void onClose() {
+
+	}
+
+	@Override
 	public JSONObject onMessage(JSONObject message) {
 		// TODO Auto-generated method stub
 		return null;

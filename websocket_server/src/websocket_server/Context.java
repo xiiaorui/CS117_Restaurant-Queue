@@ -11,7 +11,7 @@ import org.java_websocket.WebSocket;
 public class Context {
 
 	private final WebSocket mConnection;
-	private Connection mDatabaseConnection;
+	private Connection mDatabaseConnection = null;
 	private DeviceType mDeviceType;
 	private MessageHandler mHandler;
 	private int mMessageID = 1;
@@ -19,16 +19,11 @@ public class Context {
 	public Context(WebSocket conn, DeviceType type) {
 		mConnection = conn;
 		try {
-			mDatabaseConnection = DriverManager.getConnection(
-				DatabaseClient.URL,
-				DatabaseClient.USER,
-				DatabaseClient.PASS
-			);
+			setType(type);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		setType(type);
 	}
 
 	public WebSocket getConnection() {
@@ -43,16 +38,18 @@ public class Context {
 		return mDeviceType;
 	}
 
-	public void setType(DeviceType type) {
+	public void setType(DeviceType type) throws SQLException {
 		mDeviceType = type;
 		if (type == null)
 			throw new RuntimeException("DeviceType cannot be set to null");
 		switch (type) {
 		case CLIENT:
 			mHandler = new ClientMessageHandler(this);
+			mDatabaseConnection = DatabaseClient.getNewClientConnection();
 			break;
 		case SERVER:
 			mHandler = new ServerMessageHandler(this);
+			mDatabaseConnection = DatabaseClient.getNewServerConnection();
 			break;
 		}
 	}

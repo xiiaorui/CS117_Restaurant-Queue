@@ -8,6 +8,7 @@ public class MessageHandlerUtil {
 	// sets the default values of response
 	// returns whether there was an error
 	public static boolean setDefaultResponse(JSONObject req, JSONObject resp) {
+		resp.put("error", 0);	// default error code (no error)
 		try {
 			int id = req.getInt("id");
 			resp.put("id", id);

@@ -2,6 +2,7 @@ package websocket_server;
 
 import java.util.logging.Logger;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ServerMessageHandler implements MessageHandler {
@@ -17,8 +18,13 @@ public class ServerMessageHandler implements MessageHandler {
 	public void onOpen() {
 		sLogger.info(
 			"New server connection. Address: "
-			+ mContext.getConnection().getRemoteSocketAddress().getAddress().getHostAddress()
+			+ Utility.getRemoteAddress(mContext.getConnection())
 		);
+	}
+
+	@Override
+	public void onClose() {
+
 	}
 
 	@Override
@@ -34,8 +40,35 @@ public class ServerMessageHandler implements MessageHandler {
 				DatabaseClient.getOpenRestaurants(mContext.getDatabaseConnection())
 			);
 			break;
+		case OPEN_RESTAURANT:
+			doOpenRestaurant(message, resp);
+			break;
 		}
 		return resp;
+	}
+
+	private void doOpenRestaurant(JSONObject req, JSONObject resp) {
+		// check if req contains restaurant_id
+		int restaurant_id = -1;
+		try {
+			restaurant_id = req.getInt("restaurant_id");
+		} catch (JSONException e) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			return;
+		}
+		if (restaurant_id < 0) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			return;
+		}
+		// update database
+		int affectedRows = DatabaseClient.openRestaurant(
+			mContext.getDatabaseConnection(),
+			restaurant_id
+		);
+		if (affectedRows < 0) {
+			MessageHandlerUtil.setError(resp, ErrorCode.DATABASE_ERROR);
+			return;
+		}
 	}
 
 }

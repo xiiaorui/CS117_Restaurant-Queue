@@ -1,7 +1,9 @@
 package websocket_server;
 
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.java_websocket.WebSocket;
@@ -16,18 +18,27 @@ public class Server extends WebSocketServer {
 	public static final String SERVER_RESOURCE_DESCRIPTOR = "server";
 	private static Server sServerInstance;
 	private static Logger sLogger = Logger.getLogger(Server.class.getName());
-	private HashMap<WebSocket, Context> mContextMap;
 	private static HashMap<String, ServerAction> sServerActionMap;
+	private Map<WebSocket, Context> mContextMap;
 
-	public Server(InetSocketAddress address) {
+	private Server(InetSocketAddress address) {
 		super(address);
-		mContextMap = new HashMap<>();
+		mContextMap = Collections.synchronizedMap(new HashMap<>());
 	}
 
 	@Override
-	public void onClose(WebSocket arg0, int arg1, String arg2, boolean arg3) {
-		// TODO Auto-generated method stub
-
+	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+		sLogger.info(
+			"onClose(address=" + Utility.getRemoteAddress(conn)
+			+ ", code=" + code + ", reason=" + reason
+			+ ", remote=" + remote + ")"
+		);
+		// remove from Context map if it is in there
+		Context context = mContextMap.remove(conn);
+		if (context != null) {
+			// a context did exist for this connection
+			context.getHandler().onClose();
+		}
 	}
 
 	@Override
@@ -62,7 +73,7 @@ public class Server extends WebSocketServer {
 		sLogger.info(
 			"New connection. Resource: \"" + conn.getResourceDescriptor()
 			+ "\" Resource path: \"" + resourcePath + "\" Address: "
-			+ conn.getRemoteSocketAddress().getAddress().getHostAddress()
+			+ Utility.getRemoteAddress(conn)
 		);
 		// generate DeviceType
 		DeviceType type = null;	// default value
@@ -107,11 +118,11 @@ public class Server extends WebSocketServer {
 			return resourceDescriptor.substring(1, colonPos);
 	}
 
-	public static Server init(InetSocketAddress address) {
+	public static Server init(int port) {
 		if (sServerInstance != null) {
 			throw new RuntimeException("Server already initialized");
 		}
-		sServerInstance = new Server(address);
+		sServerInstance = new Server(new InetSocketAddress(port));
 		// initialize sServerActionMap
 		sServerActionMap = new HashMap<>();
 		for (ServerAction action : ServerAction.values()) {
@@ -125,8 +136,7 @@ public class Server extends WebSocketServer {
 	}
 
 	public static void main(String[] args) {
-		InetSocketAddress localAddress = new InetSocketAddress(80);
-		Server.init(localAddress);
+		Server.init(80);
 		Server.get().start();
 		sLogger.info("Server started on port: " + Server.get().getPort());
 	}
