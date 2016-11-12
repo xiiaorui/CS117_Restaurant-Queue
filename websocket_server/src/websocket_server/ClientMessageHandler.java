@@ -1,6 +1,5 @@
 package websocket_server;
 
-import org.java_websocket.WebSocket;
 import org.json.JSONObject;
 
 public class ClientMessageHandler implements MessageHandler {
@@ -12,9 +11,14 @@ public class ClientMessageHandler implements MessageHandler {
 	}
 
 	@Override
-	public void onMessage(WebSocket conn, Context context, JSONObject message) {
-		// TODO Auto-generated method stub
+	public void onOpen() {
 
+	}
+
+	@Override
+	public JSONObject onMessage(JSONObject message) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

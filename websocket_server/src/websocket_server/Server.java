@@ -12,11 +12,12 @@ import org.json.JSONObject;
 
 public class Server extends WebSocketServer {
 
-	private static final String CLIENT_RESOURCE_DESCRIPTOR = "/client";
-	private static final String SERVER_RESOURCE_DESCRIPTOR = "/server";
+	public static final String CLIENT_RESOURCE_DESCRIPTOR = "client";
+	public static final String SERVER_RESOURCE_DESCRIPTOR = "server";
 	private static Server sServerInstance;
 	private static Logger sLogger = Logger.getLogger(Server.class.getName());
 	private HashMap<WebSocket, Context> mContextMap;
+	private static HashMap<String, ServerAction> sServerActionMap;
 
 	public Server(InetSocketAddress address) {
 		super(address);
@@ -37,29 +38,43 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onMessage(WebSocket conn, String message) {
-		Context context = getContext(conn);
+		sLogger.info("New message: \"" + message + "\"");
+		JSONObject messageJSON = null;
+		JSONObject resp = null;
 		try {
-			JSONObject json = new JSONObject(message);
-			context.getHandler().onMessage(conn, context, json);
+			messageJSON = new JSONObject(message);
 		}
 		catch (JSONException e) {
 			// message was not a valid JSON object
+			resp = new JSONObject();
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_JSON);
+			conn.send(resp.toString());
+			return;
 		}
+		Context context = getContext(conn);
+		resp = context.getHandler().onMessage(messageJSON);
+		conn.send(resp.toString());
 	}
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		sLogger.info("New connection.\nResource: " + conn.getResourceDescriptor()
-				+ "\nAddress: " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+		String resourcePath = getResourcePath(conn.getResourceDescriptor());
+		sLogger.info(
+			"New connection. Resource: \"" + conn.getResourceDescriptor()
+			+ "\" Resource path: \"" + resourcePath + "\" Address: "
+			+ conn.getRemoteSocketAddress().getAddress().getHostAddress()
+		);
 		// generate DeviceType
 		DeviceType type = null;	// default value
-		if (conn.getResourceDescriptor().equals(CLIENT_RESOURCE_DESCRIPTOR)) {
-			type = DeviceType.CLIENT;
+		if (resourcePath != null) {
+			if (resourcePath.equals(CLIENT_RESOURCE_DESCRIPTOR)) {
+				type = DeviceType.CLIENT;
+			}
+			else if (resourcePath.equals(SERVER_RESOURCE_DESCRIPTOR)) {
+				type = DeviceType.SERVER;
+			}
 		}
-		else if (conn.getResourceDescriptor().equals(SERVER_RESOURCE_DESCRIPTOR)) {
-			type = DeviceType.SERVER;
-		}
-		else {
+		if (type == null) {
 			// invalid resource descriptor, close connection
 		}
 
@@ -67,10 +82,29 @@ public class Server extends WebSocketServer {
 		Context context = new Context(conn, type);
 		// add Context to context map
 		mContextMap.put(conn, context);
+		context.getHandler().onOpen();
+	}
+
+	public static ServerAction getServerActionFromString(String str) {
+		return sServerActionMap.get(str);
 	}
 
 	private Context getContext(WebSocket conn) {
 		return mContextMap.get(conn);
+	}
+
+	// resourceDescriptor looks like "/path:port"
+	// tries to return just path
+	private static String getResourcePath(String resourceDescriptor) {
+		if ((resourceDescriptor == null) || (resourceDescriptor.isEmpty()))
+			return null;
+		if (resourceDescriptor.charAt(0) != '/')
+			return null;
+		int colonPos = resourceDescriptor.indexOf(':');
+		if (colonPos == -1)
+			return resourceDescriptor.substring(1);
+		else
+			return resourceDescriptor.substring(1, colonPos);
 	}
 
 	public static Server init(InetSocketAddress address) {
@@ -78,6 +112,11 @@ public class Server extends WebSocketServer {
 			throw new RuntimeException("Server already initialized");
 		}
 		sServerInstance = new Server(address);
+		// initialize sServerActionMap
+		sServerActionMap = new HashMap<>();
+		for (ServerAction action : ServerAction.values()) {
+			sServerActionMap.put(action.getValue(), action);
+		}
 		return sServerInstance;
 	}
 
