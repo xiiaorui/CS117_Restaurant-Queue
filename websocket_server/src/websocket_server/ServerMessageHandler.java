@@ -24,7 +24,7 @@ public class ServerMessageHandler implements MessageHandler {
 
 	@Override
 	public void onClose() {
-
+		// TODO notify RestaurantManager and all waiting parties
 	}
 
 	@Override
@@ -69,6 +69,8 @@ public class ServerMessageHandler implements MessageHandler {
 			MessageHandlerUtil.setError(resp, ErrorCode.DATABASE_ERROR);
 			return;
 		}
+		// update RestaurantManager
+		RestaurantManager.get().open(mContext, restaurant_id);
 	}
 
 }

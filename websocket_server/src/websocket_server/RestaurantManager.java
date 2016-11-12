@@ -1,9 +1,8 @@
 package websocket_server;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 
 public class RestaurantManager {
 
@@ -24,15 +23,22 @@ public class RestaurantManager {
 		return sRestaurantManager;
 	}
 
-	public class Restaurant {
-
-		public int mID;
-		public Queue<Context> mQueue;
-
-		public Restaurant() {
-			mID = -1;
-			mQueue = new ArrayDeque<Context>();
-		}
-
+	public void open(Context serverContext, int restaurantID) {
+		Restaurant newRestaurant = new Restaurant(serverContext);
+		mRestaurantMap.putIfAbsent(restaurantID, newRestaurant);
 	}
+
+	public void addParty(int restaurantID, Party party) {
+		Restaurant restaurant = mRestaurantMap.get(restaurantID);
+		restaurant.addParty(party);
+		// TODO notify server
+	}
+
+	public ArrayList<Party> getFrontOfQueue(int restaurantID) {
+		Restaurant restaurant = mRestaurantMap.get(restaurantID);
+		if (restaurant == null)
+			return null;
+		return restaurant.getFrontOfQueue();
+	}
+
 }
