@@ -27,8 +27,8 @@ public class login extends AppCompatActivity {
 
                 Name_rest = text.getText().toString();
                 temp.sendMessage1(Name_rest);
-                Intent intent = new Intent(getApplicationContext(), .class);
-                startActivity(intent);
+                //Intent intent = new Intent(getApplicationContext(), .class);
+                //startActivity(intent);
             }
         });
     }
