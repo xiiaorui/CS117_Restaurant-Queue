@@ -51,12 +51,12 @@ public class MainScreen extends AppCompatActivity {
             startActivity(intent);
         }
         Intent intent = new Intent(getApplicationContext(),DisplayListView.class);
-        intent.putExtra("Myclass", (Serializable) connection);
-        startActivity(intent);
+        //intent.putExtra("Myclass", (Serializable) connection);
+        //startActivity(intent);
 
         Intent intent2 = new Intent(getApplicationContext(),login.class);
-        intent2.putExtra("Myclass", (Serializable) connection);
-        startActivity(intent2);
+        //intent2.putExtra("Myclass", (Serializable) connection);
+        //startActivity(intent2);
         resturant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
