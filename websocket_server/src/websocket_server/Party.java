@@ -11,4 +11,8 @@ public class Party {
 		mSize = size;
 	}
 
+	public Context getClientContext() {
+		return mClientContext;
+	}
+
 }

@@ -1,7 +1,6 @@
 package websocket_server;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.java_websocket.WebSocket;
@@ -14,7 +13,7 @@ public class Context {
 	private Connection mDatabaseConnection = null;
 	private DeviceType mDeviceType;
 	private MessageHandler mHandler;
-	private int mMessageID = 1;
+	private Integer mMessageID = 1;
 
 	public Context(WebSocket conn, DeviceType type) {
 		mConnection = conn;
@@ -59,8 +58,11 @@ public class Context {
 	}
 
 	public int getNewMessageID() {
-		int newID = mMessageID;
-		mMessageID += 2;
+		int newID;
+		synchronized(mMessageID) {
+			newID = mMessageID;
+			mMessageID += 2;
+		}
 		return newID;
 	}
 

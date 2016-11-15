@@ -17,13 +17,31 @@ public class ClientMessageHandler implements MessageHandler {
 
 	@Override
 	public void onClose() {
-
+		// The client has disconnected.
+		// Remove from queue if it is one.
+		RestaurantManager.get().leaveQueue(mContext);
 	}
 
 	@Override
 	public JSONObject onMessage(JSONObject message) {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject resp = new JSONObject();
+		if (MessageHandlerUtil.setDefaultResponse(message, resp)) {
+			return resp;
+		}
+		switch (Server.getServerActionFromString(message.getString("action"))) {
+		case GET_OPEN_RESTAURANTS:
+			resp.put(
+				"list",
+				DatabaseClient.getOpenRestaurants(mContext.getDatabaseConnection())
+			);
+			break;
+		case OPEN_RESTAURANT:
+		case CREATE_RESTAURANT:
+			// invalid action
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			break;
+		}
+		return resp;
 	}
 
 }
