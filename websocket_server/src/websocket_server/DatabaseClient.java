@@ -79,4 +79,30 @@ public class DatabaseClient {
 		return affectedRows;
 	}
 
+	public static int createRestaurant(Connection conn, String name) {
+		String query = "INSERT INTO restaurants (name) VALUES (?)";
+		int newRestaurantID = -1;
+		try {
+			PreparedStatement prepStmt = conn.prepareStatement(
+				query,
+				Statement.RETURN_GENERATED_KEYS
+			);
+			prepStmt.setString(1, name);
+			int affectedRows = prepStmt.executeUpdate();
+			if (affectedRows == 0) {
+				throw new SQLException("inserting new restaurant failed, no rows affected");
+			}
+			ResultSet keys = prepStmt.getGeneratedKeys();
+			if (keys.next()) {
+				newRestaurantID = keys.getInt(1);
+			} else {
+				throw new SQLException("inserting new restaurant failed, no ID");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return newRestaurantID;
+	}
+
 }

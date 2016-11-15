@@ -34,14 +34,17 @@ public class ServerMessageHandler implements MessageHandler {
 			return resp;
 		}
 		switch (Server.getServerActionFromString(message.getString("action"))) {
-		case GET_OPEN_RESTAURANTS:
+		case GET_OPEN_RESTAURANTS:	// to be removed
 			resp.put(
-				"resp",
+				"list",
 				DatabaseClient.getOpenRestaurants(mContext.getDatabaseConnection())
 			);
 			break;
 		case OPEN_RESTAURANT:
 			doOpenRestaurant(message, resp);
+			break;
+		case CREATE_RESTAURANT:
+			doCreateRestaurant(message, resp);
 			break;
 		}
 		return resp;
@@ -71,6 +74,27 @@ public class ServerMessageHandler implements MessageHandler {
 		}
 		// update RestaurantManager
 		RestaurantManager.get().open(mContext, restaurant_id);
+	}
+
+	private void doCreateRestaurant(JSONObject req, JSONObject resp) {
+		// check if req contains name
+		String restaurantName = null;
+		try {
+			restaurantName = req.getString("name");
+		} catch (JSONException e) {
+			System.out.println("assdasda");
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			return;
+		}
+		int newRestaurantID = DatabaseClient.createRestaurant(
+			mContext.getDatabaseConnection(),
+			restaurantName
+		);
+		if (newRestaurantID == -1) {
+			MessageHandlerUtil.setError(resp, ErrorCode.DATABASE_ERROR);
+			return;
+		}
+		resp.put("restaurant_id", newRestaurantID);
 	}
 
 }

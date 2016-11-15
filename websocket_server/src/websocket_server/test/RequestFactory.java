@@ -9,17 +9,25 @@ public class RequestFactory {
 	private static int sMessageID = 0;
 
 	public static JSONObject openRestaurantsList() {
-		JSONObject req = new JSONObject();
-		req.put("id", getNewMessageID());
-		req.put("action", ServerAction.GET_OPEN_RESTAURANTS.getValue());
-		return req;
+		return newRequest(ServerAction.GET_OPEN_RESTAURANTS);
 	}
 
 	public static JSONObject openRestaurant(int restaurantID) {
+		JSONObject req = newRequest(ServerAction.OPEN_RESTAURANT);
+		req.put("restaurant_id", restaurantID);
+		return req;
+	}
+
+	public static JSONObject createRestaurant(String name) {
+		JSONObject req = newRequest(ServerAction.CREATE_RESTAURANT);
+		req.put("name", name);
+		return req;
+	}
+
+	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());
-		req.put("action", ServerAction.OPEN_RESTAURANT.getValue());
-		req.put("restaurant_id", restaurantID);
+		req.put("action", action.getValue());
 		return req;
 	}
 

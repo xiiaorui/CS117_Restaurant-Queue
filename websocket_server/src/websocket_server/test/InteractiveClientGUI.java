@@ -2,7 +2,6 @@ package websocket_server.test;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -107,6 +106,9 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			case OPEN_RESTAURANT:
 				req = genOpenRestaurantRequest();
 				break;
+			case CREATE_RESTAURANT:
+				req = genCreateRequestRequest();
+				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");
 			}
@@ -137,6 +139,11 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			}
 		} while (repeat);
 		return RequestFactory.openRestaurant(restaurantID);
+	}
+
+	private JSONObject genCreateRequestRequest() {
+		String restaurantName = JOptionPane.showInputDialog(null, "restaurant name");
+		return RequestFactory.createRestaurant(restaurantName);
 	}
 
 	private static ServerAction getAction(String actionStr) {
