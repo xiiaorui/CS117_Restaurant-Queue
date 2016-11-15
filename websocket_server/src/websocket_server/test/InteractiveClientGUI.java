@@ -8,15 +8,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.DefaultCaret;
 
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -27,7 +30,7 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 
 	InteractiveClient mClient = null;
 	JTextField mURIInput;
-	JTextField mInput;
+	JComboBox mInput;
 	JTextArea mOutput;
 	JScrollPane mScrollPane;
 	JButton mConnectButton;
@@ -48,6 +51,8 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 
 		mOutput = new JTextArea(15, 1);
 		mOutput.setLineWrap(true);
+		DefaultCaret caret = (DefaultCaret) mOutput.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		mScrollPane = new JScrollPane(
 			mOutput,
 			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -55,11 +60,17 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 		);
 		pane.add(mScrollPane, BorderLayout.CENTER);
 
-		mInput = new JTextField(60);
+		Vector<String> comboItems = new Vector<>();
+		for (ServerAction action : ServerAction.values()) {
+			comboItems.add(action.getValue());
+		}
+		Collections.sort(comboItems);
+		mInput = new JComboBox(comboItems);
 		pane.add(mInput);
 
 		mSendButton = new JButton("Send");
 		mSendButton.addActionListener(this);
+		mSendButton.setEnabled(false);
 		pane.add(mSendButton);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {
@@ -89,10 +100,9 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			outputAppend("Attempting to connect to: " + uriStr);
 			mClient = new InteractiveClient(uri, this);
 			mClient.connect();
-			mConnectButton.setEnabled(false);
 		}
 		else if (event.getSource() == mSendButton) {
-			String actionStr = mInput.getText();
+			String actionStr = (String) mInput.getSelectedItem();
 			ServerAction action = getAction(actionStr);
 			JSONObject req = null;
 			if (action == null) {
@@ -116,7 +126,6 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 				String reqStr = req.toString();
 				outputAppend("Request:\n" + reqStr + "\n");
 				mClient.send(reqStr);
-				mInput.setText(null);
 			}
 		}
 	}
@@ -158,8 +167,6 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 	// always appends a newline after text
 	private void outputAppend(String text) {
 		mOutput.append(text + "\n");
-		JScrollBar vertical = mScrollPane.getVerticalScrollBar();
-		vertical.setValue(vertical.getMaximum());
 	}
 
 	public void notifyOnClose(int code, String reason, boolean remote) {
@@ -178,6 +185,8 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 	}
 
 	public void notifyOnOpen(ServerHandshake arg0) {
+		mConnectButton.setEnabled(false);
+		mSendButton.setEnabled(true);
 		outputAppend("Successfully connected to server.\n");
 	}
 
