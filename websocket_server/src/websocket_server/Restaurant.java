@@ -24,6 +24,10 @@ public class Restaurant {
 		return mName;
 	}
 
+	public Context getServerContext() {
+		return mServerContext;
+	}
+
 	public synchronized boolean addParty(Party party) {
 		if (mAcceptingNewParty) {
 			mQueue.add(party);

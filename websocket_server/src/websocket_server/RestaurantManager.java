@@ -136,6 +136,10 @@ public class RestaurantManager {
 		}
 		if (restaurant.addParty(party)) {
 			// Successfully added party to queue.
+			// Notify restaurant.
+			restaurant.getServerContext().sendNotification(
+				NotificationFactory.enterQueue()
+			);
 			return true;
 		} else {
 			// The restaurant is not accepting new parties.

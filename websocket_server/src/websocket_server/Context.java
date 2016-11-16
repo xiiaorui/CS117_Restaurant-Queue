@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.java_websocket.WebSocket;
+import org.json.JSONObject;
 
 // Each connection has an associated Context which contains
 //   all state information.
@@ -64,6 +65,11 @@ public class Context {
 
 	public MessageHandler getHandler() {
 		return mHandler;
+	}
+
+	public void sendNotification(JSONObject obj) {
+		obj.put("id", getNewMessageID());
+		mConnection.send(obj.toString());
 	}
 
 	public int getNewMessageID() {

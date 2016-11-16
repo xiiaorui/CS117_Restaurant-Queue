@@ -59,7 +59,7 @@ public class ClientMessageHandler implements MessageHandler {
 
 	private void doQueue(JSONObject req, JSONObject resp) {
 		Integer id = null;
-		if (!Utility.hasKey(req, "restaurant_id")) {
+		if (!req.has("restaurant_id")) {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing restaurant_id");
 			return;
 		}
@@ -67,11 +67,11 @@ public class ClientMessageHandler implements MessageHandler {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "invalid restaurant_id");
 			return;
 		}
-		if (!Utility.hasKey(req, "party_name")) {
+		if (!req.has("party_name")) {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing party_name");
 			return;
 		}
-		if (!Utility.hasKey(req, "party_size")) {
+		if (!req.has("party_size")) {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing party_size");
 			return;
 		}

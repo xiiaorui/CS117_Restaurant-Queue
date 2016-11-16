@@ -10,11 +10,6 @@ public class Utility {
 		return conn.getRemoteSocketAddress().getAddress().getHostAddress();
 	}
 
-	// Does obj[key] exist?
-	public static boolean hasKey(JSONObject obj, String key) {
-		return (obj.opt(key) != null);
-	}
-
 	// Is obj[key] an integer?
 	public static boolean isInt(JSONObject obj, String key) {
 		try {
