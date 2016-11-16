@@ -69,11 +69,11 @@ public class ServerMessageHandler implements MessageHandler {
 		try {
 			restaurant_id = req.getInt("restaurant_id");
 		} catch (JSONException e) {
-			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing restaurant_id");
 			return;
 		}
 		if (restaurant_id < 0) {
-			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "invalid restaurant_id");
 			return;
 		}
 		// query database
@@ -97,7 +97,7 @@ public class ServerMessageHandler implements MessageHandler {
 		try {
 			restaurantName = req.getString("name");
 		} catch (JSONException e) {
-			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing name");
 			return;
 		}
 		int newRestaurantID = DatabaseClient.createRestaurant(

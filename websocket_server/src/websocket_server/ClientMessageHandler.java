@@ -5,14 +5,16 @@ import org.json.JSONObject;
 public class ClientMessageHandler implements MessageHandler {
 
 	private final Context mContext;
+	private Party mParty;
 
 	public ClientMessageHandler(Context context) {
 		mContext = context;
+		mParty = null;
 	}
 
 	@Override
 	public void onOpen() {
-
+		// Do nothing.
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class ClientMessageHandler implements MessageHandler {
 		case OPEN_RESTAURANT:
 		case CREATE_RESTAURANT:
 			// invalid action
-			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "server action requested");
 			break;
 		}
 		return resp;
