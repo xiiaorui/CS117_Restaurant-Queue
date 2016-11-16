@@ -2,11 +2,12 @@ package websocket_server;
 
 public class Party {
 
-	Context mClientContext;
+	private final Context mClientContext;
 	private String mName;
 	private int mSize;
 
-	public Party(String name, int size) {
+	public Party(Context clientContext, String name, int size) {
+		mClientContext = clientContext;
 		mName = name;
 		mSize = size;
 	}

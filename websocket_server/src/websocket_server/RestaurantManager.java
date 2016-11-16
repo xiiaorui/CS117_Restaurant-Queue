@@ -78,40 +78,71 @@ public class RestaurantManager {
 			// The restaurant was not open.
 			return;
 		}
+		restaurant.close();
 		// Notify customers that restaurant has closed.
 		// TODO
 	}
 
-	public void queue(Context clientContext, int restaurantID) {
+	// Returns true if party joins restaurant queue or if it is already part of that queue.
+	public boolean queue(int restaurantID, Party party) {
 		boolean shouldUnlockClientMapMutex = true;
+		boolean retVal = false;
 		mClientMapMutex.lock();
 		try {
-			Integer prevRestaurantID = mClientMap.put(clientContext, restaurantID);
+			Integer prevRestaurantID = mClientMap.put(party.getClientContext(), restaurantID);
 			if (prevRestaurantID != null) {
 				// The client was currently in a queue and has requested to join
 				//   another queue.
 				if (restaurantID == prevRestaurantID) {
 					// The client wants to join the same queue it is already in.
 					// Do nothing in this case.
+					retVal = true;
 				} else {
 					// We notify the previous restaurant that the client has left
 					//   the queue.
 					shouldUnlockClientMapMutex = false;
 					mClientMapMutex.unlock();
-					notifyLeaveQueue(prevRestaurantID, clientContext);
+					notifyLeaveQueue(prevRestaurantID, party.getClientContext());
+					// We now add party to requested restaurant queue.
+					retVal = joinQueue(restaurantID, party);
 				}
+			} else {
+				// This is the most common case: queuing into a restaurant
+				//   when client is not currently in a queue.
+				// Get the associated restaurant.
+				shouldUnlockClientMapMutex = false;
+				mClientMapMutex.unlock();
+				retVal = joinQueue(restaurantID, party);
 			}
 		} finally {
 			if (shouldUnlockClientMapMutex) {
 				mClientMapMutex.unlock();
 			}
 		}
+		return retVal;
 	}
 
-	public void addParty(int restaurantID, Context clientContext, Party party) {
-		Restaurant restaurant = mRestaurantMap.get(restaurantID);
-		restaurant.addParty(party);
-		// TODO notify server
+	private boolean joinQueue(int restaurantID, Party party) {
+		Restaurant restaurant = null;
+		mRestaurantMapMutex.lock();
+		try {
+			restaurant = mRestaurantMap.get(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		if (restaurant == null) {
+			// The restaurant is not open.
+			return false;
+		}
+		if (restaurant.addParty(party)) {
+			// Successfully added party to queue.
+			return true;
+		} else {
+			// The restaurant is not accepting new parties.
+			// This is the case where restaurant is closing at
+			//   same time that party wants to join queue.
+			return false;
+		}
 	}
 
 	// The client leaves the queue it is in.

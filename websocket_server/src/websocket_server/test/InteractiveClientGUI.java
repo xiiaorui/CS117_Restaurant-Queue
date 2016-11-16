@@ -121,7 +121,10 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 				req = genOpenRestaurantRequest();
 				break;
 			case CREATE_RESTAURANT:
-				req = genCreateRequestRequest();
+				req = genCreateRestaurantRequest();
+				break;
+			case QUEUE:
+				req = genQueueRequest();
 				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");
@@ -156,11 +159,46 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 		return RequestFactory.openRestaurant(restaurantID);
 	}
 
-	private JSONObject genCreateRequestRequest() {
+	private JSONObject genCreateRestaurantRequest() {
 		String restaurantName = JOptionPane.showInputDialog(null, "restaurant name");
 		if (restaurantName == null)
 			return null;
 		return RequestFactory.createRestaurant(restaurantName);
+	}
+
+	private JSONObject genQueueRequest() {
+		int restaurantID = -1;
+		String partyName;
+		int partySize = -1;
+		boolean repeat;
+		do {
+			repeat = false;
+			String restaurantIDStr = JOptionPane.showInputDialog(null, "restaurant ID");
+			if (restaurantIDStr == null)
+				return null;
+			try {
+				restaurantID = Integer.parseInt(restaurantIDStr);
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Invalid restaurant ID.");
+				repeat = true;
+			}
+		} while (repeat);
+		partyName = JOptionPane.showInputDialog(null, "party name");
+		if (partyName == null)
+			return null;
+		do {
+			repeat = false;
+			String partySizeStr = JOptionPane.showInputDialog(null, "party size");
+			if (partySizeStr == null)
+				return null;
+			try {
+				partySize = Integer.parseInt(partySizeStr);
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Invalid party size.");
+				repeat = true;
+			}
+		} while (repeat);
+		return RequestFactory.queue(restaurantID, partyName, partySize);
 	}
 
 	private static ServerAction getAction(String actionStr) {

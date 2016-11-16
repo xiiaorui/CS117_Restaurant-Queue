@@ -3,7 +3,7 @@ package websocket_server;
 public enum ErrorCode {
 
 	NO_ERROR(0, ""), INVALID_JSON(1, "invalid JSON"), INVALID_REQUEST(2, "invalid request"),
-	DATABASE_ERROR(3, "database error");
+	DATABASE_ERROR(3, "database error"), RESTAURANT_NOT_OPEN(4, "restaurant is not open");
 
 	private final int mValue;
 	private final String mReason;

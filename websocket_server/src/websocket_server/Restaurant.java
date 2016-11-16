@@ -12,6 +12,7 @@ public class Restaurant {
 	private Context mServerContext;
 	private final String mName;
 	private Queue<Party> mQueue;
+	private boolean mAcceptingNewParty = true;
 
 	public Restaurant(Context serverContext, String name) {
 		mServerContext = serverContext;
@@ -23,8 +24,12 @@ public class Restaurant {
 		return mName;
 	}
 
-	public synchronized void addParty(Party party) {
-		mQueue.add(party);
+	public synchronized boolean addParty(Party party) {
+		if (mAcceptingNewParty) {
+			mQueue.add(party);
+			return true;
+		}
+		return false;
 	}
 
 	public synchronized void removeFromQueue(Party party) {
@@ -38,6 +43,10 @@ public class Restaurant {
 			front.add(iter.next());
 		}
 		return front;
+	}
+
+	public synchronized void close() {
+		mAcceptingNewParty = false;
 	}
 
 }

@@ -24,6 +24,14 @@ public class RequestFactory {
 		return req;
 	}
 
+	public static JSONObject queue(int restaurantID, String partyName, int partySize) {
+		JSONObject req = newRequest(ServerAction.QUEUE);
+		req.put("restaurant_id", restaurantID);
+		req.put("party_name", partyName);
+		req.put("party_size", partySize);
+		return req;
+	}
+
 	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());
