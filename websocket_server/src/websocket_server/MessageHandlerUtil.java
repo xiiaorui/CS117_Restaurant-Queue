@@ -1,9 +1,26 @@
 package websocket_server;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import websocket_server.schema.RestaurantsRow;
+
 public class MessageHandlerUtil {
+
+	public static JSONArray getOpenRestaurants() {
+		JSONArray list = new JSONArray();
+		ArrayList<RestaurantsRow> restaurants = RestaurantManager.get().getOpenRestaurants();
+		for (RestaurantsRow restaurant : restaurants) {
+			JSONArray sublist = new JSONArray();
+			sublist.put(restaurant.id);
+			sublist.put(restaurant.name);
+			list.put(sublist);
+		}
+		return list;
+	}
 
 	// sets the default values of response
 	// returns whether there was an error

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import websocket_server.schema.RestaurantsRow;
+
 public class RestaurantManager {
 
 	private static RestaurantManager sRestaurantManager;
@@ -34,11 +36,27 @@ public class RestaurantManager {
 		return sRestaurantManager;
 	}
 
-	public void open(Context serverContext, int restaurantID) {
-		Restaurant newRestaurant = new Restaurant(serverContext);
+	public ArrayList<RestaurantsRow> getOpenRestaurants() {
+		ArrayList<RestaurantsRow> list = new ArrayList<>();
 		mRestaurantMapMutex.lock();
 		try {
-			mRestaurantMap.putIfAbsent(restaurantID, newRestaurant);
+			for (Map.Entry<Integer, Restaurant> entry : mRestaurantMap.entrySet()) {
+				list.add(new RestaurantsRow(
+					entry.getKey(),
+					entry.getValue().getName()
+				));
+			}
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		return list;
+	}
+
+	public void open(Context serverContext, RestaurantsRow restaurant) {
+		Restaurant newRestaurant = new Restaurant(serverContext, restaurant.name);
+		mRestaurantMapMutex.lock();
+		try {
+			mRestaurantMap.putIfAbsent(restaurant.id, newRestaurant);
 		} finally {
 			mRestaurantMapMutex.unlock();
 		}

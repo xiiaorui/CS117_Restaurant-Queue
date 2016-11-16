@@ -10,14 +10,20 @@ import java.util.Queue;
 public class Restaurant {
 
 	private Context mServerContext;
+	private final String mName;
 	private Queue<Party> mQueue;
 	// Maps a given client Context to its Party
 	private Map<Context, Party> mMap;
 
-	public Restaurant(Context serverContext) {
+	public Restaurant(Context serverContext, String name) {
 		mServerContext = serverContext;
+		mName = name;
 		mQueue = new ArrayDeque<Party>();
 		mMap = new HashMap<>();
+	}
+
+	public String getName() {
+		return mName;
 	}
 
 	public synchronized void addParty(Context clientContext, Party party) {

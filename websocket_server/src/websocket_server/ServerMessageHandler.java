@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import websocket_server.schema.RestaurantsRow;
+
 public class ServerMessageHandler implements MessageHandler {
 
 	private static final Logger sLogger = Logger.getLogger(ServerMessageHandler.class.getName());
@@ -37,7 +39,7 @@ public class ServerMessageHandler implements MessageHandler {
 		case GET_OPEN_RESTAURANTS:	// to be removed
 			resp.put(
 				"list",
-				DatabaseClient.getOpenRestaurants(mContext.getDatabaseConnection())
+				MessageHandlerUtil.getOpenRestaurants()
 			);
 			break;
 		case OPEN_RESTAURANT:
@@ -63,17 +65,17 @@ public class ServerMessageHandler implements MessageHandler {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
 			return;
 		}
-		// update database
-		int affectedRows = DatabaseClient.openRestaurant(
+		// query database
+		RestaurantsRow restaurant = DatabaseClient.getRestaurant(
 			mContext.getDatabaseConnection(),
 			restaurant_id
 		);
-		if (affectedRows < 0) {
+		if (restaurant == null) {
 			MessageHandlerUtil.setError(resp, ErrorCode.DATABASE_ERROR);
 			return;
 		}
 		// update RestaurantManager
-		RestaurantManager.get().open(mContext, restaurant_id);
+		RestaurantManager.get().open(mContext, restaurant);
 	}
 
 	private void doCreateRestaurant(JSONObject req, JSONObject resp) {
@@ -82,7 +84,6 @@ public class ServerMessageHandler implements MessageHandler {
 		try {
 			restaurantName = req.getString("name");
 		} catch (JSONException e) {
-			System.out.println("assdasda");
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
 			return;
 		}

@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.json.JSONArray;
+import websocket_server.schema.RestaurantsRow;
 
 public class DatabaseClient {
 
@@ -30,53 +30,27 @@ public class DatabaseClient {
 		sPass = pass;
 	}
 
-	public static JSONArray getOpenRestaurants(Connection conn) {
-		JSONArray rows = new JSONArray();
-		Statement stmt = null;
+	public static RestaurantsRow getRestaurant(Connection conn, int restaurantID) {
+		RestaurantsRow row = null;
+		String query = "SELECT * FROM restaurants WHERE id = ?";
 		try {
-			stmt = conn.createStatement();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String query = "SELECT * FROM restaurants WHERE open IS TRUE";
-		ResultSet result = null;
-		try {
-			result = stmt.executeQuery(query);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			while (result.next()) {
-				JSONArray row = new JSONArray();
-				int id = result.getInt("id");
-				String name = result.getString("name");
-				row.put(id);
-				row.put(name);
-				rows.put(row);
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, restaurantID);
+			ResultSet result = stmt.executeQuery();
+			if (result.next()) {
+				row = new RestaurantsRow();
+				row.id = result.getInt(1);
+				row.name = result.getString(2);
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return rows;
-	}
+			else {
+				// Requested restaurant does not exist.
+			}
 
-	public static int openRestaurant(Connection conn, int restaurant_id) {
-		String query = "UPDATE restaurants SET open=TRUE WHERE id=?";
-		PreparedStatement prepStmt = null;
-		int affectedRows = 0;
-		try {
-			prepStmt = conn.prepareStatement(query);
-			prepStmt.setInt(1, restaurant_id);
-			affectedRows = prepStmt.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			affectedRows = -1;
 		}
-		return affectedRows;
+		return row;
 	}
 
 	public static int createRestaurant(Connection conn, String name) {

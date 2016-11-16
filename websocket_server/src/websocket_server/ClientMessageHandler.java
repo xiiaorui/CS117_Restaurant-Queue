@@ -32,7 +32,7 @@ public class ClientMessageHandler implements MessageHandler {
 		case GET_OPEN_RESTAURANTS:
 			resp.put(
 				"list",
-				DatabaseClient.getOpenRestaurants(mContext.getDatabaseConnection())
+				MessageHandlerUtil.getOpenRestaurants()
 			);
 			break;
 		case OPEN_RESTAURANT:
