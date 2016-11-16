@@ -11,6 +11,7 @@ public class ServerMessageHandler implements MessageHandler {
 
 	private static final Logger sLogger = Logger.getLogger(ServerMessageHandler.class.getName());
 	private final Context mContext;
+	private int mID = -1;	// restaurant ID
 
 	public ServerMessageHandler(Context context) {
 		mContext = context;
@@ -26,7 +27,11 @@ public class ServerMessageHandler implements MessageHandler {
 
 	@Override
 	public void onClose() {
-		// TODO notify RestaurantManager and all waiting parties
+		if (mID != -1) {
+			RestaurantManager.get().close(mID);
+			// clear mID
+			mID = -1;
+		}
 	}
 
 	@Override
@@ -53,6 +58,12 @@ public class ServerMessageHandler implements MessageHandler {
 	}
 
 	private void doOpenRestaurant(JSONObject req, JSONObject resp) {
+		// if restaurant is open, then mID is set
+		if (mID != -1) {
+			// Restaurant has requested to open after already opening.
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST);
+			return;
+		}
 		// check if req contains restaurant_id
 		int restaurant_id = -1;
 		try {
@@ -74,7 +85,9 @@ public class ServerMessageHandler implements MessageHandler {
 			MessageHandlerUtil.setError(resp, ErrorCode.DATABASE_ERROR);
 			return;
 		}
-		// update RestaurantManager
+		// update mID
+		mID = restaurant_id;
+		// notify RestaurantManager
 		RestaurantManager.get().open(mContext, restaurant);
 	}
 

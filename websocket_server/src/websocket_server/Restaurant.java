@@ -12,29 +12,23 @@ public class Restaurant {
 	private Context mServerContext;
 	private final String mName;
 	private Queue<Party> mQueue;
-	// Maps a given client Context to its Party
-	private Map<Context, Party> mMap;
 
 	public Restaurant(Context serverContext, String name) {
 		mServerContext = serverContext;
 		mName = name;
 		mQueue = new ArrayDeque<Party>();
-		mMap = new HashMap<>();
 	}
 
 	public String getName() {
 		return mName;
 	}
 
-	public synchronized void addParty(Context clientContext, Party party) {
+	public synchronized void addParty(Party party) {
 		mQueue.add(party);
-		mMap.put(clientContext, party);
 	}
 
-	public synchronized void removeFromQueue(Context clientContext) {
-		Party party = mMap.get(clientContext);
-		if (party != null)
-			mQueue.remove(party);
+	public synchronized void removeFromQueue(Party party) {
+		mQueue.remove(party);
 	}
 
 	public synchronized ArrayList<Party> getFrontOfQueue() {

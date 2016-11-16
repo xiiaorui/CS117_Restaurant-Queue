@@ -52,6 +52,7 @@ public class RestaurantManager {
 		return list;
 	}
 
+	// Open a restaurant.
 	public void open(Context serverContext, RestaurantsRow restaurant) {
 		Restaurant newRestaurant = new Restaurant(serverContext, restaurant.name);
 		mRestaurantMapMutex.lock();
@@ -60,6 +61,25 @@ public class RestaurantManager {
 		} finally {
 			mRestaurantMapMutex.unlock();
 		}
+	}
+
+	// Close a restaurant.
+	public void close(int restaurantID) {
+		Restaurant restaurant = null;
+		if (restaurantID < 0)
+			return;	// invalid ID
+		mRestaurantMapMutex.lock();
+		try {
+			restaurant = mRestaurantMap.remove(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		if (restaurant == null) {
+			// The restaurant was not open.
+			return;
+		}
+		// Notify customers that restaurant has closed.
+		// TODO
 	}
 
 	public void queue(Context clientContext, int restaurantID) {
@@ -90,7 +110,7 @@ public class RestaurantManager {
 
 	public void addParty(int restaurantID, Context clientContext, Party party) {
 		Restaurant restaurant = mRestaurantMap.get(restaurantID);
-		restaurant.addParty(clientContext, party);
+		restaurant.addParty(party);
 		// TODO notify server
 	}
 
