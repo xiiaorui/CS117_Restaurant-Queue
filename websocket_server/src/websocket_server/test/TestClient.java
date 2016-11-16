@@ -21,6 +21,7 @@ public class TestClient extends WebSocketClient {
 
 	public TestClient(URI uri) {
 		super(uri);
+		System.out.println(uri);
 	}
 
 	@Override
@@ -93,7 +94,7 @@ public class TestClient extends WebSocketClient {
 			uriStr = args[0];
 		}
 		else {
-			uriStr = "ws://localhost/" + Server.SERVER_RESOURCE_DESCRIPTOR + ":80";
+			uriStr = "ws://localhost/" + Server.RESTAURANT_RESOURCE_DESCRIPTOR + ":80";
 		}
 		URI uri = null;
 		try {

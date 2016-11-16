@@ -24,6 +24,7 @@ import javax.swing.text.DefaultCaret;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
+import websocket_server.Server;
 import websocket_server.ServerAction;
 
 public class InteractiveClientGUI extends JFrame implements ActionListener {
@@ -42,7 +43,10 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 		Container pane = getContentPane();
 		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
-		mURIInput = new JTextField("ws://localhost/server:80", 100);
+		mURIInput = new JTextField(
+			"ws://localhost/" + Server.RESTAURANT_RESOURCE_DESCRIPTOR + ":80",
+			80
+		);
 		pane.add(mURIInput);
 
 		mConnectButton = new JButton("Connect");

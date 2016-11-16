@@ -11,11 +11,11 @@ public class Context {
 
 	private final WebSocket mConnection;
 	private Connection mDatabaseConnection = null;
-	private DeviceType mDeviceType;
+	private UserType mUserType;
 	private MessageHandler mHandler;
 	private Integer mMessageID = 1;
 
-	public Context(WebSocket conn, DeviceType type) {
+	public Context(WebSocket conn, UserType type) {
 		mConnection = conn;
 		try {
 			setType(type);
@@ -33,20 +33,15 @@ public class Context {
 		return mDatabaseConnection;
 	}
 
-	public DeviceType getType() {
-		return mDeviceType;
-	}
-
-	public void setType(DeviceType type) throws SQLException {
-		mDeviceType = type;
+	public void setType(UserType type) throws SQLException {
+		mUserType = type;
 		if (type == null)
-			throw new RuntimeException("DeviceType cannot be set to null");
+			throw new RuntimeException("UserType cannot be set to null");
 		switch (type) {
-		case CLIENT:
+		case CUSTOMER:
 			mHandler = new ClientMessageHandler(this);
-			mDatabaseConnection = DatabaseClient.getNewClientConnection();
 			break;
-		case SERVER:
+		case RESTAURANT:
 			mHandler = new ServerMessageHandler(this);
 			mDatabaseConnection = DatabaseClient.getNewServerConnection();
 			break;

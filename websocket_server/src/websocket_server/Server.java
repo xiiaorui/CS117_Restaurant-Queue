@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 public class Server extends WebSocketServer {
 
-	public static final String CLIENT_RESOURCE_DESCRIPTOR = "client";
-	public static final String SERVER_RESOURCE_DESCRIPTOR = "server";
+	public static final String CUSTOMER_RESOURCE_DESCRIPTOR = "customer";
+	public static final String RESTAURANT_RESOURCE_DESCRIPTOR = "restaurant";
 	private static Server sServerInstance;
 	private static Logger sLogger = Logger.getLogger(Server.class.getName());
 	private static HashMap<String, ServerAction> sServerActionMap;
@@ -76,13 +76,13 @@ public class Server extends WebSocketServer {
 			+ Utility.getRemoteAddress(conn)
 		);
 		// generate DeviceType
-		DeviceType type = null;	// default value
+		UserType type = null;	// default value
 		if (resourcePath != null) {
-			if (resourcePath.equals(CLIENT_RESOURCE_DESCRIPTOR)) {
-				type = DeviceType.CLIENT;
+			if (resourcePath.equals(CUSTOMER_RESOURCE_DESCRIPTOR)) {
+				type = UserType.CUSTOMER;
 			}
-			else if (resourcePath.equals(SERVER_RESOURCE_DESCRIPTOR)) {
-				type = DeviceType.SERVER;
+			else if (resourcePath.equals(RESTAURANT_RESOURCE_DESCRIPTOR)) {
+				type = UserType.RESTAURANT;
 			}
 		}
 		if (type == null) {
