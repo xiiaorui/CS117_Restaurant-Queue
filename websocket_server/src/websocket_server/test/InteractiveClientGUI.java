@@ -30,7 +30,7 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 
 	InteractiveClient mClient = null;
 	JTextField mURIInput;
-	JComboBox mInput;
+	JComboBox<String> mInput;
 	JTextArea mOutput;
 	JScrollPane mScrollPane;
 	JButton mConnectButton;
@@ -65,7 +65,7 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			comboItems.add(action.getValue());
 		}
 		Collections.sort(comboItems);
-		mInput = new JComboBox(comboItems);
+		mInput = new JComboBox<String>(comboItems);
 		pane.add(mInput);
 
 		mSendButton = new JButton("Send");
@@ -140,6 +140,8 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 		do {
 			repeat = false;
 			String idStr = JOptionPane.showInputDialog(null, "restaurant ID");
+			if (idStr == null)
+				return null;
 			try {
 				restaurantID = Integer.parseInt(idStr);
 			} catch (NumberFormatException e) {
@@ -152,6 +154,8 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 
 	private JSONObject genCreateRequestRequest() {
 		String restaurantName = JOptionPane.showInputDialog(null, "restaurant name");
+		if (restaurantName == null)
+			return null;
 		return RequestFactory.createRestaurant(restaurantName);
 	}
 
