@@ -34,13 +34,7 @@ public class MainScreen extends AppCompatActivity {
         customer = (Button) findViewById(R.id.customerB);
         resturant = (Button) findViewById(R.id.resturantB);
 
-        URI uri = null;
-        try {
-            uri = new URI("ws://159.203.248.21/server:80/");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        clientClass connection = new clientClass(uri);
+        /*clientClass connection = new clientClass(uri);
         connection.connect();
         String Json_string = connection.responeMessage();
         if (Json_string == null)
@@ -49,7 +43,7 @@ public class MainScreen extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), DisplayListView.class);
             intent.putExtra("Json data", Json_string);
             startActivity(intent);
-        }
+        }*/
         Intent intent = new Intent(getApplicationContext(),DisplayListView.class);
         //intent.putExtra("Myclass", (Serializable) connection);
         //startActivity(intent);
