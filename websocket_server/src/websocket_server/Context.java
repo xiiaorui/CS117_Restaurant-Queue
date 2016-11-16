@@ -2,6 +2,8 @@ package websocket_server;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.java_websocket.WebSocket;
 
@@ -14,6 +16,10 @@ public class Context {
 	private UserType mUserType;
 	private MessageHandler mHandler;
 	private Integer mMessageID = 1;
+	// We want to process only one change of state at a time.
+	// For example joining a queue, or being forcefully removed from
+	//   a queue because the restaurant closed.
+	private final Lock mLock = new ReentrantLock(true);
 
 	public Context(WebSocket conn, UserType type) {
 		mConnection = conn;
@@ -31,6 +37,14 @@ public class Context {
 
 	public Connection getDatabaseConnection() {
 		return mDatabaseConnection;
+	}
+
+	public void lock() {
+		mLock.lock();
+	}
+
+	public void unlock() {
+		mLock.unlock();
 	}
 
 	public void setType(UserType type) throws SQLException {

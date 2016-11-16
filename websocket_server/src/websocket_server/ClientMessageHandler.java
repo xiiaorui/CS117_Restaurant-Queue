@@ -19,32 +19,42 @@ public class ClientMessageHandler implements MessageHandler {
 	public void onClose() {
 		// The client has disconnected.
 		// Remove from queue if it is one.
-		RestaurantManager.get().leaveQueue(mContext);
+		mContext.lock();
+		try {
+			RestaurantManager.get().leaveQueue(mContext);
+		} finally {
+			mContext.unlock();
+		}
 	}
 
 	@Override
 	public JSONObject onMessage(JSONObject message) {
-		JSONObject resp = new JSONObject();
-		if (MessageHandlerUtil.setDefaultResponse(message, resp)) {
+		mContext.lock();
+		try {
+			JSONObject resp = new JSONObject();
+			if (MessageHandlerUtil.setDefaultResponse(message, resp)) {
+				return resp;
+			}
+			switch (Server.getServerActionFromString(message.getString("action"))) {
+			case GET_OPEN_RESTAURANTS:
+				resp.put(
+					"list",
+					MessageHandlerUtil.getOpenRestaurants()
+				);
+				break;
+			case QUEUE:
+				doQueue(message, resp);
+				break;
+			case OPEN_RESTAURANT:
+			case CREATE_RESTAURANT:
+				// invalid action
+				MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "server action requested");
+				break;
+			}
 			return resp;
+		} finally {
+			mContext.unlock();
 		}
-		switch (Server.getServerActionFromString(message.getString("action"))) {
-		case GET_OPEN_RESTAURANTS:
-			resp.put(
-				"list",
-				MessageHandlerUtil.getOpenRestaurants()
-			);
-			break;
-		case QUEUE:
-			doQueue(message, resp);
-			break;
-		case OPEN_RESTAURANT:
-		case CREATE_RESTAURANT:
-			// invalid action
-			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "server action requested");
-			break;
-		}
-		return resp;
 	}
 
 	private void doQueue(JSONObject req, JSONObject resp) {

@@ -27,34 +27,52 @@ public class ServerMessageHandler implements MessageHandler {
 
 	@Override
 	public void onClose() {
-		if (mID != -1) {
-			RestaurantManager.get().close(mID);
-			// clear mID
-			mID = -1;
+		mContext.lock();
+		try {
+			if (mID != -1) {
+				RestaurantManager.get().close(mID);
+				// clear mID
+				mID = -1;
+			}
+		} finally {
+			mContext.unlock();
 		}
 	}
 
 	@Override
 	public JSONObject onMessage(JSONObject message) {
-		JSONObject resp = new JSONObject();
-		if (MessageHandlerUtil.setDefaultResponse(message, resp)) {
+		mContext.lock();
+		try {
+			JSONObject resp = new JSONObject();
+			if (MessageHandlerUtil.setDefaultResponse(message, resp)) {
+				return resp;
+			}
+			switch (Server.getServerActionFromString(message.getString("action"))) {
+			case GET_OPEN_RESTAURANTS:	// to be removed
+				resp.put(
+					"list",
+					MessageHandlerUtil.getOpenRestaurants()
+				);
+				break;
+			case OPEN_RESTAURANT:
+				doOpenRestaurant(message, resp);
+				break;
+			case CREATE_RESTAURANT:
+				doCreateRestaurant(message, resp);
+				break;
+			case QUEUE:
+				// invalid action
+				MessageHandlerUtil.setError(
+					resp,
+					ErrorCode.INVALID_REQUEST,
+					"client action requested"
+				);
+				break;
+			}
 			return resp;
+		} finally {
+			mContext.unlock();
 		}
-		switch (Server.getServerActionFromString(message.getString("action"))) {
-		case GET_OPEN_RESTAURANTS:	// to be removed
-			resp.put(
-				"list",
-				MessageHandlerUtil.getOpenRestaurants()
-			);
-			break;
-		case OPEN_RESTAURANT:
-			doOpenRestaurant(message, resp);
-			break;
-		case CREATE_RESTAURANT:
-			doCreateRestaurant(message, resp);
-			break;
-		}
-		return resp;
 	}
 
 	private void doOpenRestaurant(JSONObject req, JSONObject resp) {
