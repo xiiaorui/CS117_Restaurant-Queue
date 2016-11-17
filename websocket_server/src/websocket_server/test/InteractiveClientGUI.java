@@ -115,7 +115,7 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			}
 			switch (action) {
 			case GET_OPEN_RESTAURANTS:
-				req = genGetOpenRestaurantsRequest();
+				req = RequestFactory.openRestaurantsList();
 				break;
 			case OPEN_RESTAURANT:
 				req = genOpenRestaurantRequest();
@@ -126,6 +126,9 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			case QUEUE:
 				req = genQueueRequest();
 				break;
+			case LEAVE_QUEUE:
+				req = RequestFactory.leaveQueue();
+				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");
 			}
@@ -135,10 +138,6 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 				mClient.send(reqStr);
 			}
 		}
-	}
-
-	private JSONObject genGetOpenRestaurantsRequest() {
-		return RequestFactory.openRestaurantsList();
 	}
 
 	private JSONObject genOpenRestaurantRequest() {

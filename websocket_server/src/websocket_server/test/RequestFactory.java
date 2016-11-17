@@ -32,6 +32,10 @@ public class RequestFactory {
 		return req;
 	}
 
+	public static JSONObject leaveQueue() {
+		return newRequest(ServerAction.LEAVE_QUEUE);
+	}
+
 	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());

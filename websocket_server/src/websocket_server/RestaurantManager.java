@@ -174,7 +174,8 @@ public class RestaurantManager {
 		Restaurant restaurant = mRestaurantMap.get(restaurantID);
 		mRestaurantMapMutex.unlock();
 		if (restaurant != null) {
-			// TODO remove client from queue
+			restaurant.removeFromQueue(clientContext);
+			// TODO Send notification to restaurant that client has left.
 		}
 	}
 

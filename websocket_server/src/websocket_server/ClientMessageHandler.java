@@ -45,10 +45,17 @@ public class ClientMessageHandler implements MessageHandler {
 			case QUEUE:
 				doQueue(message, resp);
 				break;
+			case LEAVE_QUEUE:
+				doLeaveQueue(message, resp);
+				break;
 			case OPEN_RESTAURANT:
 			case CREATE_RESTAURANT:
 				// invalid action
-				MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "server action requested");
+				MessageHandlerUtil.setError(
+					resp,
+					ErrorCode.INVALID_REQUEST,
+					"server action requested"
+				);
 				break;
 			}
 			return resp;
@@ -90,6 +97,18 @@ public class ClientMessageHandler implements MessageHandler {
 			MessageHandlerUtil.setError(resp, ErrorCode.RESTAURANT_NOT_OPEN);
 		}
 		// TODO include position and wait time in response
+		// For now, include wrong information.
+		resp.put("position", 1);
+		resp.put("wait_time", 0);
+	}
+
+	private void doLeaveQueue(JSONObject req, JSONObject resp) {
+		mContext.lock();
+		try {
+			RestaurantManager.get().leaveQueue(mContext);
+		} finally {
+			mContext.unlock();
+		}
 	}
 
 }
