@@ -11,39 +11,33 @@
     tools:context="com.example.wenhuikuang.resturantcheckin.MainScreen">
 
     <Button
-        android:text="Resturant Owner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/resturantB"
-        android:layout_below="@+id/customerB"
-        android:layout_alignLeft="@+id/customerB"
-        android:layout_alignStart="@+id/customerB"
-        android:layout_marginTop="60dp"
-        android:layout_alignRight="@+id/customerB"
-        android:layout_alignEnd="@+id/customerB" />
-
-    <Button
         android:text="Customer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/customerB"
-        android:layout_marginTop="184dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="86dp"
-        android:layout_marginStart="86dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="74dp"
-        android:layout_marginEnd="74dp" />
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/resturantB"
+        android:layout_alignEnd="@+id/resturantB"
+        android:layout_alignLeft="@+id/resturantB"
+        android:layout_alignStart="@+id/resturantB" />
 
     <TextView
         android:text="Wellcome to use Resturant Check-In App"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
-        android:layout_alignParentTop="true"
+        android:textSize="15dp"
+        android:layout_above="@+id/customerB"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="88dp" />
+        android:layout_marginBottom="76dp" />
+
+    <Button
+        android:text="Resturant Owner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/resturantB"
+        android:layout_marginTop="62dp"
+        android:layout_below="@+id/customerB"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

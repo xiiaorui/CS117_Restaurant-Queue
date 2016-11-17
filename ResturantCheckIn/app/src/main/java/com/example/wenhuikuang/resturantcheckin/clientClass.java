@@ -18,15 +18,23 @@ import org.json.JSONObject;
  */
 
 public class clientClass extends WebSocketClient {
+    private static clientClass sclientclass;
     String Json_string;
+    int RequestId = 0;
 
     public clientClass(URI uri){
         super(uri);
     }
+    public static clientClass getInstance(URI uri)
+    {
+        if (sclientclass == null)
+            sclientclass = new clientClass(uri);
+        return sclientclass;
+    }
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         Log.i("Websocket", "Opened");
-        send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+//        send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
     }
 
     @Override
@@ -65,11 +73,40 @@ public class clientClass extends WebSocketClient {
             e.printStackTrace();
         }
     }
-
-    public void sendMessage1(String name){
+    private int getRequestId(){
+        return RequestId;
+    }
+    public void getRestaurant(){
         try {
             JSONObject Obj = new JSONObject();
-            Obj.put("Name", name);
+            Obj.put("action", "get_restaurants");
+            Obj.put("id",RequestId);
+            RequestId += 2;
+            send(Obj.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public void openRestaruant(int id){
+        try{
+            JSONObject Obj = new JSONObject();
+            Obj.put("restaurant_id",id);
+            Obj.put("action","open_restaurant");
+            Obj.put("id",RequestId);
+            RequestId += 2;
+            send(Obj.toString());
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+    }
+    public void createRestaruant(String name){
+        try {
+            JSONObject Obj = new JSONObject();
+            Obj.put("name", name);
+            Obj.put("action","create_restaurant");
+            Obj.put("id",RequestId);
+            RequestId += 2;
+            send(Obj.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
