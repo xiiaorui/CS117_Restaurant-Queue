@@ -34,7 +34,8 @@
         <activity android:name=".login" />
         <activity android:name=".customer" />
         <activity android:name=".DisplayListView" />
-        <activity android:name=".DisplayCustomerInfo"></activity>
+        <activity android:name=".DisplayCustomerInfo" />
+        <activity android:name=".customer2"></activity>
     </application>
 
 </manifest>

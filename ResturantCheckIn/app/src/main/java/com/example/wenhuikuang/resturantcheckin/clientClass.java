@@ -18,51 +18,57 @@ import org.json.JSONObject;
  */
 
 public class clientClass extends WebSocketClient {
+    private final String TAG = "check";
     private static clientClass sclientclass;
-    String Json_string;
+    private ClientListener clientListener;
+    String Json_string = "ss";
     int RequestId = 0;
 
-    public clientClass(URI uri){
+    private clientClass(URI uri, ClientListener clientListener){
         super(uri);
+        this.clientListener = clientListener;
     }
     public static clientClass getInstance(URI uri)
     {
-        if (sclientclass == null)
-            sclientclass = new clientClass(uri);
         return sclientclass;
     }
     @Override
+    public void send(String message){
+        Log.d(TAG,message);
+        super.send(message);
+    }
+    @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        Log.i("Websocket", "Opened");
-//        send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+        clientListener.onOpen();
+    }
+    public void setListener(ClientListener listener) {
+        clientListener = listener;
+    }
+    @Override
+    public void onMessage(String message) {
+        JSONObject resp = null;
+        try {
+            resp = new JSONObject(message);
+        } catch (JSONException e) {
+            // invalid JSON object, which should never happen...
+        }
+        try {
+            clientListener.onMessage(resp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void onMessage(String s) {
-        Json_string = s;
-//        if (Json_string == null)
-//            Toast.makeText(getApplicationContext(),"First Get JSON", Toast.LENGTH_LONG).show();
-//        else{
-//            Intent intent = new Intent(getApplicationContext(), DisplayListView.class);
-//            intent.putExtra("Json data", Json_string);
-//            startActivity(intent);
-//        }
-    }
-
-    public String responeMessage(){
-        return Json_string;
-    }
-
-    @Override
-    public void onClose(int i, String s, boolean b) {
-        Log.i("Websocket", "Closed " + s);
+    public void onClose(int code, String reason, boolean remote) {
+        clientListener.onClose(code, reason, remote);
     }
 
     @Override
     public void onError(Exception e) {
-        Log.i("Websocket", "Error " + e.getMessage());
+        clientListener.onError(e);
     }
-    public void sendMessage(String name, String size) {
+    public void sendCustomerInfo(String name, String size) {
         try{
             JSONObject Obj = new JSONObject();
             Obj.put("Name",name);
@@ -111,4 +117,29 @@ public class clientClass extends WebSocketClient {
             e.printStackTrace();
         }
     }
+    public static void init(ClientListener listener, boolean isCustomer) {
+        if (sclientclass != null) {
+            // TODO properly handle this logic error
+            throw new RuntimeException("");
+        }
+        String uriStr = "ws://159.203.248.21/";
+        if (isCustomer)
+            uriStr = uriStr + "restaurant";
+        else
+            uriStr = uriStr + "customer";
+        uriStr = uriStr + ":80";
+        try {
+            URI uri = new URI(uriStr);
+            sclientclass = new clientClass(uri, listener);
+            sclientclass.connect();
+        } catch (URISyntaxException e) {
+            // TODO should never happen...
+            e.printStackTrace();
+        }
+    }
+    public static clientClass get()
+    {
+        return sclientclass;
+    }
+
 }
