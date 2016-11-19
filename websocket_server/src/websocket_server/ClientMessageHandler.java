@@ -70,7 +70,6 @@ public class ClientMessageHandler implements MessageHandler {
 	}
 
 	private void doQueue(JSONObject req, JSONObject resp) {
-		Integer id = null;
 		if (!req.has("restaurant_id")) {
 			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing restaurant_id");
 			return;
@@ -96,16 +95,15 @@ public class ClientMessageHandler implements MessageHandler {
 		String party_name = Utility.getStr(req, "party_name");
 		int party_size = Utility.getInt(req, "party_size");
 		Party party = new Party(mContext, party_name, party_size);
-		if (!RestaurantManager.get().queue(restaurant_id, party)) {
+		QueueStatus status = RestaurantManager.get().queue(restaurant_id, party);
+		if (status == null) {
 			// Party was not added to restaurant queue.
 			// We assume this can only happen if the restaurant is not open.
 			MessageHandlerUtil.setError(resp, ErrorCode.RESTAURANT_NOT_OPEN);
 			return;
 		}
-		// TODO include position and wait time in response
-		// For now, include wrong information.
-		resp.put("position", 1);
-		resp.put("wait_time", 0);
+		resp.put("position", status.getPosition());
+		resp.put("wait_time", status.getWaitTime());
 	}
 
 	private void doLeaveQueue(JSONObject req, JSONObject resp) {

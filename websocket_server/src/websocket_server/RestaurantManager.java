@@ -91,64 +91,68 @@ public class RestaurantManager {
 		}
 	}
 
-	// Returns true if party joins restaurant queue or if it is already part of that queue.
-	public boolean queue(int restaurantID, Party party) {
-		boolean shouldUnlockClientMapMutex = true;
-		boolean retVal = false;
+	// Returns QueueStatus if party joins restaurant queue or is already part of that queue.
+	// Returns null otherwise.
+	public QueueStatus queue(int restaurantID, Party party) {
+		QueueStatus status = null;
+		Integer prevRestaurantID = null;
 		mClientMapMutex.lock();
 		try {
-			Integer prevRestaurantID = mClientMap.put(party.getClientContext(), restaurantID);
-			if (prevRestaurantID != null) {
-				// The client was currently in a queue and has requested to join
-				//   another queue.
-				if (restaurantID == prevRestaurantID) {
-					// The client wants to join the same queue it is already in.
-					// Do nothing in this case.
-					retVal = true;
+			prevRestaurantID = mClientMap.put(party.getClientContext(), restaurantID);
+		} finally {
+			mClientMapMutex.unlock();
+		}
+		if (prevRestaurantID != null) {
+			// The client was currently in a queue and has requested to join
+			//   another queue.
+			if (restaurantID == prevRestaurantID) {
+				// The client wants to join the same queue it is already in.
+				// Do nothing in this case.
+				Restaurant restaurant = getRestaurant(restaurantID);
+				if (restaurant == null) {
+					// The restaurant must have just closed.
+					// Return null status.
 				} else {
-					// We notify the previous restaurant that the client has left
-					//   the queue.
-					shouldUnlockClientMapMutex = false;
-					mClientMapMutex.unlock();
-					notifyLeaveQueue(prevRestaurantID, party.getClientContext());
-					// We now add party to requested restaurant queue.
-					retVal = joinQueue(restaurantID, party);
+					status = restaurant.getStatus(party.getClientContext());
 				}
 			} else {
-				// This is the most common case: queuing into a restaurant
-				//   when client is not currently in a queue.
-				// Get the associated restaurant.
-				shouldUnlockClientMapMutex = false;
-				mClientMapMutex.unlock();
-				retVal = joinQueue(restaurantID, party);
+				// We notify the previous restaurant that the client has left
+				//   the queue.
+				notifyLeaveQueue(prevRestaurantID, party.getClientContext(), false);
+				// We now add party to requested restaurant queue.
+				status = joinQueue(restaurantID, party);
 			}
-		} finally {
-			if (shouldUnlockClientMapMutex) {
-				mClientMapMutex.unlock();
-			}
+		} else {
+			// This is the most common case: queuing into a restaurant
+			//   when client is not currently in a queue.
+			// Get the associated restaurant.
+			status = joinQueue(restaurantID, party);
 		}
-		return retVal;
+		return status;
 	}
 
-	private boolean joinQueue(int restaurantID, Party party) {
+	// Returns QueueStatus if party was able to join queue.
+	// Returns null otherwise.
+	private QueueStatus joinQueue(int restaurantID, Party party) {
 		Restaurant restaurant = getRestaurant(restaurantID);
+		QueueStatus status = null;
 		if (restaurant == null) {
 			// The restaurant is not open.
-			return false;
+			return null;
 		}
-		if (restaurant.addParty(party)) {
-			// Successfully added party to queue.
-			// Notify restaurant.
-			restaurant.getServerContext().sendNotification(
-				NotificationFactory.enterQueue()
-			);
-			return true;
-		} else {
+		status = restaurant.addParty(party);
+		if (status == null) {
 			// The restaurant is not accepting new parties.
 			// This is the case where restaurant is closing at
 			//   same time that party wants to join queue.
-			return false;
+			return null;
 		}
+		// Successfully added party to queue.
+		// Notify restaurant.
+		restaurant.getServerContext().sendNotification(
+			NotificationFactory.enterQueue()
+		);
+		return status;
 	}
 
 	// The client leaves the queue it is in.
@@ -166,15 +170,16 @@ public class RestaurantManager {
 		}
 		if (restaurantID != -1) {
 			// Notify restaurant that client has left.
-			notifyLeaveQueue(restaurantID, clientContext);
+			notifyLeaveQueue(restaurantID, clientContext, false);
 		}
 	}
 
 	// Notify the restaurant that client is leaving its queue.
-	private void notifyLeaveQueue(int restaurantID, Context clientContext) {
+	// fromCall specifies if leaving queue initiated by restaurant call.
+	private void notifyLeaveQueue(int restaurantID, Context clientContext, boolean fromCall) {
 		Restaurant restaurant = getRestaurant(restaurantID);
 		if (restaurant != null) {
-			int partyID = restaurant.removeFromQueue(clientContext);
+			int partyID = restaurant.removeFromQueue(clientContext, fromCall);
 			if (partyID < 0) {
 				// Client was not in queue.
 				return;
@@ -243,7 +248,7 @@ public class RestaurantManager {
 		Context clientContext = party.getClientContext();
 		clientContext.lock();
 		try {
-			removedPartyID = restaurant.removeFromQueue(clientContext);
+			removedPartyID = restaurant.removeFromQueue(clientContext, true);
 		} finally {
 			clientContext.unlock();
 		}

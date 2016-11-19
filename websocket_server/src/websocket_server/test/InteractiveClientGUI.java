@@ -134,6 +134,7 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 				break;
 			case CALL_PARTY:
 				req = genCallPartyRequest();
+				break;
 			case QUEUE_STATUS:
 				req = RequestFactory.queueStatus();
 				break;

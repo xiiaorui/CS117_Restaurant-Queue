@@ -14,6 +14,7 @@ public class Restaurant {
 	private Queue<Party> mQueue;
 	// Maps a client Context to its party
 	private Map<Context, Party> mContextMap;
+	private final WaitTimeEstimator mEstimator;
 	// mPartyID is used to assign a unique (per restaurant) ID to each party
 	//   so that restaurant can reference a specify party through that ID.
 	private int mPartyID = 0;
@@ -24,6 +25,7 @@ public class Restaurant {
 		mName = name;
 		mQueue = new ArrayDeque<Party>();
 		mContextMap = new HashMap<>();
+		mEstimator = new WaitTimeEstimator(60 * 15);
 	}
 
 	public String getName() {
@@ -34,18 +36,21 @@ public class Restaurant {
 		return mServerContext;
 	}
 
-	public synchronized boolean addParty(Party party) {
+	public synchronized QueueStatus addParty(Party party) {
+		QueueStatus status = null;
 		if (!mIsClosed) {
 			if (party.getClientContext() == null) {
 				// A logic error occurred somewhere...
 				throw new RuntimeException("party's context cannot be null");
 			}
 			party.setID(getNewPartyID());
+			party.setTimestamp(getTimestamp());
 			mContextMap.put(party.getClientContext(), party);
 			mQueue.add(party);
-			return true;
+			// get status
+			status = new QueueStatus(mQueue.size(), mEstimator.getWaitTime(1));
 		}
-		return false;
+		return status;
 	}
 
 	// Returns the associated Party if it exists
@@ -65,7 +70,8 @@ public class Restaurant {
 
 	// Returns the party ID of the party associated with clientContext
 	// Returns -1 if there was no party or restaurant closed
-	public synchronized int removeFromQueue(Context clientContext) {
+	// fromCall specifies if this call was made due to a call by restaurant.
+	public synchronized int removeFromQueue(Context clientContext, boolean fromCall) {
 		if (mIsClosed)
 			return -1;
 		Party party = mContextMap.remove(clientContext);
@@ -77,6 +83,10 @@ public class Restaurant {
 		party.clearClientContext();
 		// update queue
 		mQueue.remove(party);
+		if (fromCall) {
+			// update wait time estimator
+			mEstimator.add(party);
+		}
 		return party.getID();
 	}
 
@@ -104,8 +114,8 @@ public class Restaurant {
 			}
 			++position;
 		}
-		// TODO set wait time
-		return (new QueueStatus(position, 0));
+		double relativePosition = ((double) position / mQueue.size());
+		return (new QueueStatus(position, mEstimator.getWaitTime(relativePosition)));
 	}
 
 	public synchronized Queue<Party> getQueueAndClose() {
@@ -120,6 +130,10 @@ public class Restaurant {
 		mServerContext = null;
 		mQueue = null;
 		mContextMap = null;
+	}
+
+	private long getTimestamp() {
+		return (System.currentTimeMillis() / 1000L);
 	}
 
 	private int getNewPartyID() {
