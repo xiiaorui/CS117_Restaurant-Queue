@@ -65,12 +65,16 @@ public class ServerMessageHandler implements MessageHandler {
 			case GET_PARTIES:
 				doGetParties(message, resp);
 				break;
+			case CALL_PARTY:
+				doCallParty(message, resp);
+				break;
 			case QUEUE:
+			case LEAVE_QUEUE:
 				// invalid action
 				MessageHandlerUtil.setError(
 					resp,
 					ErrorCode.INVALID_REQUEST,
-					"client action requested"
+					"customer action requested"
 				);
 				break;
 			}
@@ -163,6 +167,25 @@ public class ServerMessageHandler implements MessageHandler {
 			jsonParties.put(tmp);
 		}
 		resp.put("list", jsonParties);
+	}
+
+	private void doCallParty(JSONObject req, JSONObject resp) {
+		int party_id = -1;
+		// check if restaurant is open
+		if (mID < 0) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "not open");
+			return;
+		}
+		if (!req.has("party_id")) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing party_id");
+			return;
+		}
+		if (!Utility.isInt(req, "party_id") || (Utility.getInt(req, "party_id") < 0)) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "invalid party_id");
+			return;
+		}
+		party_id = Utility.getInt(req, "party_id");
+		RestaurantManager.get().callParty(mID, party_id);
 	}
 
 }

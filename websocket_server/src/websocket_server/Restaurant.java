@@ -48,6 +48,21 @@ public class Restaurant {
 		return false;
 	}
 
+	// Returns the associated Party if it exists
+	public synchronized Party getParty(int partyID) {
+		if (mIsClosed)
+			return null;
+		for (Party party : mQueue) {
+			if (party.getID() == partyID) {
+				return party;
+			} else if (party.getID() > partyID) {
+				// party is not in queue
+				break;
+			}
+		}
+		return null;
+	}
+
 	// Returns the party ID of the party associated with clientContext
 	// Returns -1 if there was no party or restaurant closed
 	public synchronized int removeFromQueue(Context clientContext) {

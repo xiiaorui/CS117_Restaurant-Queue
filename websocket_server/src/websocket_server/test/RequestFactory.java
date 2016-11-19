@@ -42,6 +42,12 @@ public class RequestFactory {
 		return req;
 	}
 
+	public static JSONObject callParty(int partyID) {
+		JSONObject req = newRequest(ServerAction.CALL_PARTY);
+		req.put("party_id", partyID);
+		return req;
+	}
+
 	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());

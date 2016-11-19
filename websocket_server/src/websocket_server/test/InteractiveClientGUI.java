@@ -132,6 +132,9 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			case GET_PARTIES:
 				req = genGetPartiesRequest();
 				break;
+			case CALL_PARTY:
+				req = genCallPartyRequest();
+				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");
 			}
@@ -219,6 +222,24 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			}
 		} while (repeat);
 		return RequestFactory.getParties(numParties);
+	}
+
+	private JSONObject genCallPartyRequest() {
+		int partyID = -1;
+		boolean repeat;
+		do {
+			repeat = false;
+			String partyIDStr = JOptionPane.showInputDialog(null, "party id");
+			if (partyIDStr == null)
+				return null;
+			try {
+				partyID = Integer.parseInt(partyIDStr);
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Invalid party ID.");
+				repeat = true;
+			}
+		} while (repeat);
+		return RequestFactory.callParty(partyID);
 	}
 
 	private static ServerAction getAction(String actionStr) {

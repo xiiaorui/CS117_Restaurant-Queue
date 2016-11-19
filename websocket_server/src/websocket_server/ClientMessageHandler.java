@@ -51,11 +51,12 @@ public class ClientMessageHandler implements MessageHandler {
 			case OPEN_RESTAURANT:
 			case CREATE_RESTAURANT:
 			case GET_PARTIES:
+			case CALL_PARTY:
 				// invalid action
 				MessageHandlerUtil.setError(
 					resp,
 					ErrorCode.INVALID_REQUEST,
-					"server action requested"
+					"restaurant action requested"
 				);
 				break;
 			}

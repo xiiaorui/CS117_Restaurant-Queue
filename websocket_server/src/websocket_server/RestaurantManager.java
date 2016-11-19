@@ -178,9 +178,13 @@ public class RestaurantManager {
 
 	// Notify the restaurant that client is leaving its queue.
 	private void notifyLeaveQueue(int restaurantID, Context clientContext) {
+		Restaurant restaurant = null;
 		mRestaurantMapMutex.lock();
-		Restaurant restaurant = mRestaurantMap.get(restaurantID);
-		mRestaurantMapMutex.unlock();
+		try {
+			restaurant = mRestaurantMap.get(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
 		if (restaurant != null) {
 			int partyID = restaurant.removeFromQueue(clientContext);
 			if (partyID < 0) {
@@ -210,6 +214,44 @@ public class RestaurantManager {
 			return null;
 		}
 		return restaurant.getFrontOfQueue(count);
+	}
+
+	public void callParty(int restaurantID, int partyID) {
+		Restaurant restaurant = null;
+		mRestaurantMapMutex.lock();
+		try {
+			restaurant = mRestaurantMap.get(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		if (restaurant == null) {
+			// Restaurant is closed or does not exist.
+			return;
+		}
+		Party party = restaurant.getParty(partyID);
+		if (party == null) {
+			// Party is not in queue.
+			return;
+		}
+		// Remove party from queue.
+		int removedPartyID = -1;
+		// Since we are updating state of client context, we should lock it.
+		Context clientContext = party.getClientContext();
+		clientContext.lock();
+		try {
+			removedPartyID = restaurant.removeFromQueue(clientContext);
+		} finally {
+			clientContext.unlock();
+		}
+		if (removedPartyID < 0) {
+			// The party was not actually removed from queue from this call.
+			// However, the party was not in queue when removeFromQueue() was called.
+			// This can occur if customer removes itself from queue
+			//   after getParty() call but before removeFromQueue() call.
+			// In this case, we do not notify customer.
+			return;
+		}
+		// TODO send notification to party
 	}
 
 }
