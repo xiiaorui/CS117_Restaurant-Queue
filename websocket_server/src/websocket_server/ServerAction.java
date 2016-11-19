@@ -8,7 +8,8 @@ public enum ServerAction {
 	QUEUE("queue"),								// join the queue of a restaurant
 	LEAVE_QUEUE("leave_queue"),					// leave current queue
 	GET_PARTIES("get_parties"),					// get the parties at front of restaurant's queue
-	CALL_PARTY("call_party");					// remove party from queue and notify them
+	CALL_PARTY("call_party"),					// remove party from queue and notify them
+	QUEUE_STATUS("queue_status");				// get status in queue
 
 	private final String mValue;
 

@@ -90,6 +90,24 @@ public class Restaurant {
 		return front;
 	}
 
+	public synchronized QueueStatus getStatus(Context clientContext) {
+		Party party = mContextMap.get(clientContext);
+		if (party == null) {
+			// Client is not in queue.
+			return null;
+		}
+		// Find position.
+		int position = 1;
+		for (Party p : mQueue) {
+			if (p == party) {
+				break;
+			}
+			++position;
+		}
+		// TODO set wait time
+		return (new QueueStatus(position, 0));
+	}
+
 	public synchronized Queue<Party> getQueueAndClose() {
 		mIsClosed = true;
 		return mQueue;

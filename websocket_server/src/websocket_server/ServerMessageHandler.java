@@ -70,6 +70,7 @@ public class ServerMessageHandler implements MessageHandler {
 				break;
 			case QUEUE:
 			case LEAVE_QUEUE:
+			case QUEUE_STATUS:
 				// invalid action
 				MessageHandlerUtil.setError(
 					resp,

@@ -48,6 +48,10 @@ public class RequestFactory {
 		return req;
 	}
 
+	public static JSONObject queueStatus() {
+		return newRequest(ServerAction.QUEUE_STATUS);
+	}
+
 	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());

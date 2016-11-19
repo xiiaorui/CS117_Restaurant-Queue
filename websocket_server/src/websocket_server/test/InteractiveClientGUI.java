@@ -134,6 +134,8 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 				break;
 			case CALL_PARTY:
 				req = genCallPartyRequest();
+			case QUEUE_STATUS:
+				req = RequestFactory.queueStatus();
 				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");

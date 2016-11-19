@@ -48,6 +48,9 @@ public class ClientMessageHandler implements MessageHandler {
 			case LEAVE_QUEUE:
 				doLeaveQueue(message, resp);
 				break;
+			case QUEUE_STATUS:
+				doQueueStatus(message, resp);
+				break;
 			case OPEN_RESTAURANT:
 			case CREATE_RESTAURANT:
 			case GET_PARTIES:
@@ -106,12 +109,18 @@ public class ClientMessageHandler implements MessageHandler {
 	}
 
 	private void doLeaveQueue(JSONObject req, JSONObject resp) {
-		mContext.lock();
-		try {
-			RestaurantManager.get().leaveQueue(mContext);
-		} finally {
-			mContext.unlock();
+		RestaurantManager.get().leaveQueue(mContext);
+	}
+
+	private void doQueueStatus(JSONObject req, JSONObject resp) {
+		QueueStatus status = RestaurantManager.get().getQueueStatus(mContext);
+		if (status == null) {
+			// Client was not in a queue.
+			MessageHandlerUtil.setError(resp, ErrorCode.NOT_IN_QUEUE);
+			return;
 		}
+		resp.put("position", status.getPosition());
+		resp.put("wait_time", status.getWaitTime());
 	}
 
 }

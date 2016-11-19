@@ -131,13 +131,7 @@ public class RestaurantManager {
 	}
 
 	private boolean joinQueue(int restaurantID, Party party) {
-		Restaurant restaurant = null;
-		mRestaurantMapMutex.lock();
-		try {
-			restaurant = mRestaurantMap.get(restaurantID);
-		} finally {
-			mRestaurantMapMutex.unlock();
-		}
+		Restaurant restaurant = getRestaurant(restaurantID);
 		if (restaurant == null) {
 			// The restaurant is not open.
 			return false;
@@ -178,13 +172,7 @@ public class RestaurantManager {
 
 	// Notify the restaurant that client is leaving its queue.
 	private void notifyLeaveQueue(int restaurantID, Context clientContext) {
-		Restaurant restaurant = null;
-		mRestaurantMapMutex.lock();
-		try {
-			restaurant = mRestaurantMap.get(restaurantID);
-		} finally {
-			mRestaurantMapMutex.unlock();
-		}
+		Restaurant restaurant = getRestaurant(restaurantID);
 		if (restaurant != null) {
 			int partyID = restaurant.removeFromQueue(clientContext);
 			if (partyID < 0) {
@@ -200,13 +188,7 @@ public class RestaurantManager {
 
 	// get up to count parties at front of queue
 	public ArrayList<Party> getFrontOfQueue(int restaurantID, int count) {
-		Restaurant restaurant = null;
-		mRestaurantMapMutex.lock();
-		try {
-			restaurant = mRestaurantMap.get(restaurantID);
-		} finally {
-			mRestaurantMapMutex.unlock();
-		}
+		Restaurant restaurant = getRestaurant(restaurantID);
 		if (restaurant == null) {
 			// The restaurant is not open.
 			// This is impossible if restaurant is the one that called
@@ -216,14 +198,36 @@ public class RestaurantManager {
 		return restaurant.getFrontOfQueue(count);
 	}
 
-	public void callParty(int restaurantID, int partyID) {
+	public QueueStatus getQueueStatus(Context clientContext) {
+		Integer restaurantID = null;
 		Restaurant restaurant = null;
-		mRestaurantMapMutex.lock();
+		mClientMapMutex.lock();
 		try {
-			restaurant = mRestaurantMap.get(restaurantID);
+			restaurantID = mClientMap.get(clientContext);
 		} finally {
-			mRestaurantMapMutex.unlock();
+			mClientMapMutex.unlock();
 		}
+		if (restaurantID == null) {
+			// Not in any queue.
+			return null;
+		}
+		restaurant = getRestaurant(restaurantID);
+		if (restaurant == null) {
+			// The restaurant must have just closed.
+			// Remove from mClientMap
+			mClientMapMutex.lock();
+			try {
+				mClientMap.remove(clientContext);
+			} finally {
+				mClientMapMutex.unlock();
+			}
+			return null;
+		}
+		return restaurant.getStatus(clientContext);
+	}
+
+	public void callParty(int restaurantID, int partyID) {
+		Restaurant restaurant = getRestaurant(restaurantID);
 		if (restaurant == null) {
 			// Restaurant is closed or does not exist.
 			return;
@@ -255,6 +259,17 @@ public class RestaurantManager {
 		clientContext.sendNotification(
 			NotificationFactory.call()
 		);
+	}
+
+	private Restaurant getRestaurant(int restaurantID) {
+		Restaurant restaurant = null;
+		mRestaurantMapMutex.lock();
+		try {
+			restaurant = mRestaurantMap.get(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		return restaurant;
 	}
 
 }
