@@ -2,7 +2,7 @@ package websocket_server;
 
 public class Party {
 
-	private final Context mClientContext;
+	private Context mClientContext;
 	private String mName;
 	private int mSize;
 	private int mID = -1;	// assigned and used only by restaurant
@@ -15,6 +15,10 @@ public class Party {
 
 	public Context getClientContext() {
 		return mClientContext;
+	}
+
+	public void clearClientContext() {
+		mClientContext = null;
 	}
 
 	public int getID() {

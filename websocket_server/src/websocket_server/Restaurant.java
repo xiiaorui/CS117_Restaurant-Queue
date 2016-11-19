@@ -48,14 +48,19 @@ public class Restaurant {
 		return false;
 	}
 
-	public synchronized void removeFromQueue(Context clientContext) {
+	// Returns the party ID of the party associated with clientContext
+	// Returns -1 if there was no party
+	public synchronized int removeFromQueue(Context clientContext) {
 		Party party = mContextMap.remove(clientContext);
 		if (party == null) {
 			// The client was not in the queue.
-			return;
+			return -1;
 		}
+		// clear party's context
+		party.clearClientContext();
 		// update queue
 		mQueue.remove(party);
+		return party.getID();
 	}
 
 	public synchronized ArrayList<Party> getFrontOfQueue() {
