@@ -39,10 +39,14 @@ public class login extends AppCompatActivity implements ClientListener{
             public void onClick(View v) {
 
                 Name_rest = text.getText().toString();
-                clientClass.get().createRestaruant(Name_rest);
-                Toast.makeText(getApplicationContext(),Name_rest + " Created",Toast.LENGTH_LONG).show();
-                intent = new Intent(getApplicationContext(),DisplayCustomerInfo.class);
-                startActivity(intent);
+                if (Name_rest == "")
+                    Toast.makeText(getApplicationContext(),"Empty name is not allowed",Toast.LENGTH_LONG).show();
+                else {
+                    clientClass.get().createRestaruant(Name_rest);
+                    Toast.makeText(getApplicationContext(), Name_rest + " Created", Toast.LENGTH_LONG).show();
+                    intent = new Intent(getApplicationContext(), DisplayCustomerInfo.class);
+                    startActivity(intent);
+                }
 //                new myTask().execute(Name_rest);
             }
 

@@ -20,6 +20,7 @@ public class MainScreen extends AppCompatActivity implements ClientListener {
     Button resturant;
     Intent intent;
     URI uri = null;
+    MainScreen main;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,12 +30,12 @@ public class MainScreen extends AppCompatActivity implements ClientListener {
         customer = (Button) findViewById(R.id.customerB);
         resturant = (Button) findViewById(R.id.resturantB);
 
-        clientClass.init(this,true);
-
+//        clientClass.init(this,true);
+        main = this;
         resturant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                clientClass.init(main,false);
                 Intent intent = new Intent(getApplicationContext(), login.class);
                 startActivity(intent);
             }
@@ -43,6 +44,7 @@ public class MainScreen extends AppCompatActivity implements ClientListener {
         customer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clientClass.init(main,true);
 //                new myTask().execute();
                 intent = new Intent(getApplicationContext(), customer2.class);
                 startActivity(intent);

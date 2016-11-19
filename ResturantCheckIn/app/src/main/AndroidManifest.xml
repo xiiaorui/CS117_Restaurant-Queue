@@ -35,7 +35,9 @@
         <activity android:name=".customer" />
         <activity android:name=".DisplayListView" />
         <activity android:name=".DisplayCustomerInfo" />
-        <activity android:name=".customer2"></activity>
+        <activity android:name=".customer2" />
+        <activity android:name=".customerWaitscreen" />
+        <activity android:name=".SplashScreen"></activity>
     </application>
 
 </manifest>

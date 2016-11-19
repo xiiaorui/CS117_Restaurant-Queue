@@ -68,11 +68,15 @@ public class clientClass extends WebSocketClient {
     public void onError(Exception e) {
         clientListener.onError(e);
     }
-    public void sendCustomerInfo(String name, String size) {
+    public void sendCustomerInfo(String name, int size, int restaurant_id) {
         try{
             JSONObject Obj = new JSONObject();
-            Obj.put("Name",name);
-            Obj.put("Size",size);
+            Obj.put("party_name",name);
+            Obj.put("restaurant_id",restaurant_id);
+            Obj.put("action","queue");
+            Obj.put("party_size",size);
+            Obj.put("id",RequestId);
+            RequestId += 2;
             send(Obj.toString());
         }
         catch (JSONException e){
@@ -117,6 +121,18 @@ public class clientClass extends WebSocketClient {
             e.printStackTrace();
         }
     }
+
+    public void leaveQueue(){
+        JSONObject object = new JSONObject();
+        try {
+            object.put("action","leave_queue");
+            object.put("id",RequestId);
+            RequestId += 2;
+            send(object.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public static void init(ClientListener listener, boolean isCustomer) {
         if (sclientclass != null) {
             // TODO properly handle this logic error
@@ -124,9 +140,9 @@ public class clientClass extends WebSocketClient {
         }
         String uriStr = "ws://159.203.248.21/";
         if (isCustomer)
-            uriStr = uriStr + "restaurant";
-        else
             uriStr = uriStr + "customer";
+        else
+            uriStr = uriStr + "restaurant";
         uriStr = uriStr + ":80";
         try {
             URI uri = new URI(uriStr);
