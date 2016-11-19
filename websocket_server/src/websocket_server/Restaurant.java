@@ -14,6 +14,9 @@ public class Restaurant {
 	private Queue<Party> mQueue;
 	// Maps a client Context to its party
 	private Map<Context, Party> mContextMap;
+	// mPartyID is used to assign a unique (per restaurant) ID to each party
+	//   so that restaurant can reference a specify party through that ID.
+	private int mPartyID = 0;
 	private boolean mAcceptingNewParty = true;
 
 	public Restaurant(Context serverContext, String name) {
@@ -37,6 +40,7 @@ public class Restaurant {
 				// A logic error occurred somewhere...
 				throw new RuntimeException("party's context cannot be null");
 			}
+			party.setID(getNewPartyID());
 			mContextMap.put(party.getClientContext(), party);
 			mQueue.add(party);
 			return true;
@@ -65,6 +69,12 @@ public class Restaurant {
 
 	public synchronized void close() {
 		mAcceptingNewParty = false;
+	}
+
+	private int getNewPartyID() {
+		int id = mPartyID;
+		mPartyID += 1;
+		return id;
 	}
 
 }
