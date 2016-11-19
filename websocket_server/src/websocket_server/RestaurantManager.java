@@ -3,8 +3,11 @@ package websocket_server;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.json.JSONObject;
 
 import websocket_server.schema.RestaurantsRow;
 
@@ -78,9 +81,14 @@ public class RestaurantManager {
 			// The restaurant was not open.
 			return;
 		}
-		restaurant.close();
 		// Notify customers that restaurant has closed.
-		// TODO
+		Queue<Party> queue = restaurant.getQueueAndClose();
+		restaurant.clear();
+		JSONObject notification = NotificationFactory.close();
+		while (!queue.isEmpty()) {
+			Party party = queue.poll();
+			party.getClientContext().sendNotification(notification);
+		}
 	}
 
 	// Returns true if party joins restaurant queue or if it is already part of that queue.

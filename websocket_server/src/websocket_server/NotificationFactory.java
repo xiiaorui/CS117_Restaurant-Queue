@@ -15,6 +15,10 @@ public class NotificationFactory {
 		return obj;
 	}
 
+	public static JSONObject close() {
+		return makeDefaultObject(NotificationType.CLOSE);
+	}
+
 	private static JSONObject makeDefaultObject(NotificationType type) {
 		JSONObject obj = new JSONObject();
 		obj.put("notification", type.getValue());

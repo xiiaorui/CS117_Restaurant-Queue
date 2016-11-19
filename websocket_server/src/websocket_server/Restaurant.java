@@ -17,7 +17,7 @@ public class Restaurant {
 	// mPartyID is used to assign a unique (per restaurant) ID to each party
 	//   so that restaurant can reference a specify party through that ID.
 	private int mPartyID = 0;
-	private boolean mAcceptingNewParty = true;
+	private boolean mIsClosed = false;
 
 	public Restaurant(Context serverContext, String name) {
 		mServerContext = serverContext;
@@ -35,7 +35,7 @@ public class Restaurant {
 	}
 
 	public synchronized boolean addParty(Party party) {
-		if (mAcceptingNewParty) {
+		if (!mIsClosed) {
 			if (party.getClientContext() == null) {
 				// A logic error occurred somewhere...
 				throw new RuntimeException("party's context cannot be null");
@@ -49,8 +49,10 @@ public class Restaurant {
 	}
 
 	// Returns the party ID of the party associated with clientContext
-	// Returns -1 if there was no party
+	// Returns -1 if there was no party or restaurant closed
 	public synchronized int removeFromQueue(Context clientContext) {
+		if (mIsClosed)
+			return -1;
 		Party party = mContextMap.remove(clientContext);
 		if (party == null) {
 			// The client was not in the queue.
@@ -73,8 +75,18 @@ public class Restaurant {
 		return front;
 	}
 
-	public synchronized void close() {
-		mAcceptingNewParty = false;
+	public synchronized Queue<Party> getQueueAndClose() {
+		mIsClosed = true;
+		return mQueue;
+	}
+
+	public synchronized void clear() {
+		if (!mIsClosed) {
+			throw new RuntimeException("cannot call clear() when still open");
+		}
+		mServerContext = null;
+		mQueue = null;
+		mContextMap = null;
 	}
 
 	private int getNewPartyID() {
