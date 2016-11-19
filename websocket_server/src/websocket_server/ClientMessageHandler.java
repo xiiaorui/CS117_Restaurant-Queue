@@ -50,6 +50,7 @@ public class ClientMessageHandler implements MessageHandler {
 				break;
 			case OPEN_RESTAURANT:
 			case CREATE_RESTAURANT:
+			case GET_PARTIES:
 				// invalid action
 				MessageHandlerUtil.setError(
 					resp,
@@ -95,6 +96,7 @@ public class ClientMessageHandler implements MessageHandler {
 			// Party was not added to restaurant queue.
 			// We assume this can only happen if the restaurant is not open.
 			MessageHandlerUtil.setError(resp, ErrorCode.RESTAURANT_NOT_OPEN);
+			return;
 		}
 		// TODO include position and wait time in response
 		// For now, include wrong information.

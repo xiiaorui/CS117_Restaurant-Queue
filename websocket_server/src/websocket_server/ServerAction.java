@@ -6,7 +6,8 @@ public enum ServerAction {
 	OPEN_RESTAURANT("open_restaurant"),			// open a restaurant
 	CREATE_RESTAURANT("create_restaurant"),		// create a new restaurant
 	QUEUE("queue"),								// join the queue of a restaurant
-	LEAVE_QUEUE("leave_queue");					// leave current queue
+	LEAVE_QUEUE("leave_queue"),					// leave current queue
+	GET_PARTIES("get_parties");					// get the parties at front of restaurant's queue
 
 	private final String mValue;
 

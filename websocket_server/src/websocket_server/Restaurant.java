@@ -63,10 +63,11 @@ public class Restaurant {
 		return party.getID();
 	}
 
-	public synchronized ArrayList<Party> getFrontOfQueue() {
+	// Get up to count parties from front of queue
+	public synchronized ArrayList<Party> getFrontOfQueue(int count) {
 		ArrayList<Party> front = new ArrayList<>();
 		Iterator<Party> iter = mQueue.iterator();
-		while (iter.hasNext() && (front.size() < 10)) {
+		while (iter.hasNext() && (front.size() < count)) {
 			front.add(iter.next());
 		}
 		return front;

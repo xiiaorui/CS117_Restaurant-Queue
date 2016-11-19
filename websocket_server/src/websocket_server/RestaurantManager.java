@@ -186,11 +186,22 @@ public class RestaurantManager {
 		}
 	}
 
-	public ArrayList<Party> getFrontOfQueue(int restaurantID) {
-		Restaurant restaurant = mRestaurantMap.get(restaurantID);
-		if (restaurant == null)
+	// get up to count parties at front of queue
+	public ArrayList<Party> getFrontOfQueue(int restaurantID, int count) {
+		Restaurant restaurant = null;
+		mRestaurantMapMutex.lock();
+		try {
+			restaurant = mRestaurantMap.get(restaurantID);
+		} finally {
+			mRestaurantMapMutex.unlock();
+		}
+		if (restaurant == null) {
+			// The restaurant is not open.
+			// This is impossible if restaurant is the one that called
+			//   this method.
 			return null;
-		return restaurant.getFrontOfQueue();
+		}
+		return restaurant.getFrontOfQueue(count);
 	}
 
 }

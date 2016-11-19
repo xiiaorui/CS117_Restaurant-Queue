@@ -30,4 +30,12 @@ public class Party {
 		mID = id;
 	}
 
+	public String getName() {
+		return mName;
+	}
+
+	public int getSize() {
+		return mSize;
+	}
+
 }

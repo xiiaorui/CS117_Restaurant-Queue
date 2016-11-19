@@ -129,6 +129,9 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			case LEAVE_QUEUE:
 				req = RequestFactory.leaveQueue();
 				break;
+			case GET_PARTIES:
+				req = genGetPartiesRequest();
+				break;
 			default:
 				JOptionPane.showMessageDialog(null, "Unimplemented action.");
 			}
@@ -198,6 +201,24 @@ public class InteractiveClientGUI extends JFrame implements ActionListener {
 			}
 		} while (repeat);
 		return RequestFactory.queue(restaurantID, partyName, partySize);
+	}
+
+	private JSONObject genGetPartiesRequest() {
+		int numParties = -1;
+		boolean repeat;
+		do {
+			repeat = false;
+			String numPartiesStr = JOptionPane.showInputDialog(null, "num parties");
+			if (numPartiesStr == null)
+				return null;
+			try {
+				numParties = Integer.parseInt(numPartiesStr);
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Invalid num parties");
+				repeat = true;
+			}
+		} while (repeat);
+		return RequestFactory.getParties(numParties);
 	}
 
 	private static ServerAction getAction(String actionStr) {

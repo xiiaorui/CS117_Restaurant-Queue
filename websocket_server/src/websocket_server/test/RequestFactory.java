@@ -36,6 +36,12 @@ public class RequestFactory {
 		return newRequest(ServerAction.LEAVE_QUEUE);
 	}
 
+	public static JSONObject getParties(int numParties) {
+		JSONObject req = newRequest(ServerAction.GET_PARTIES);
+		req.put("num_parties", numParties);
+		return req;
+	}
+
 	private static JSONObject newRequest(ServerAction action) {
 		JSONObject req = new JSONObject();
 		req.put("id", getNewMessageID());

@@ -1,7 +1,9 @@
 package websocket_server;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -59,6 +61,9 @@ public class ServerMessageHandler implements MessageHandler {
 				break;
 			case CREATE_RESTAURANT:
 				doCreateRestaurant(message, resp);
+				break;
+			case GET_PARTIES:
+				doGetParties(message, resp);
 				break;
 			case QUEUE:
 				// invalid action
@@ -127,6 +132,37 @@ public class ServerMessageHandler implements MessageHandler {
 			return;
 		}
 		resp.put("restaurant_id", newRestaurantID);
+	}
+
+	private void doGetParties(JSONObject req, JSONObject resp) {
+		int num_parties = -1;
+		// check if restaurant is open
+		if (mID < 0) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "not open");
+			return;
+		}
+		// check if req contains num_parties
+		if (!req.has("num_parties")) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "missing num_parties");
+			return;
+		}
+		if (!Utility.isInt(req, "num_parties") || (Utility.getInt(req, "num_parties") <= 0)) {
+			MessageHandlerUtil.setError(resp, ErrorCode.INVALID_REQUEST, "invalid num_parties");
+			return;
+		}
+		num_parties = Utility.getInt(req, "num_parties");
+		// get the parties
+		ArrayList<Party> parties = RestaurantManager.get().getFrontOfQueue(mID, num_parties);
+		// generate JSON list
+		JSONArray jsonParties = new JSONArray();
+		for (Party p : parties) {
+			JSONArray tmp = new JSONArray();
+			tmp.put(p.getID());
+			tmp.put(p.getName());
+			tmp.put(p.getSize());
+			jsonParties.put(tmp);
+		}
+		resp.put("list", jsonParties);
 	}
 
 }
