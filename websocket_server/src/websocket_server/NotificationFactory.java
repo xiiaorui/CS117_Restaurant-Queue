@@ -19,6 +19,10 @@ public class NotificationFactory {
 		return makeDefaultObject(NotificationType.CLOSE);
 	}
 
+	public static JSONObject call() {
+		return makeDefaultObject(NotificationType.CALL);
+	}
+
 	private static JSONObject makeDefaultObject(NotificationType type) {
 		JSONObject obj = new JSONObject();
 		obj.put("notification", type.getValue());

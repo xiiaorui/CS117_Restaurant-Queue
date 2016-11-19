@@ -251,7 +251,10 @@ public class RestaurantManager {
 			// In this case, we do not notify customer.
 			return;
 		}
-		// TODO send notification to party
+		// Send notification to party
+		clientContext.sendNotification(
+			NotificationFactory.call()
+		);
 	}
 
 }
