@@ -83,6 +83,18 @@ public class clientClass extends WebSocketClient {
             e.printStackTrace();
         }
     }
+    public void getParties(){
+        try {
+            JSONObject Obj = new JSONObject();
+            Obj.put("action", "get_parties");
+            Obj.put("id",RequestId);
+            Obj.put("num_parties",10);
+            RequestId += 2;
+            send(Obj.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     private int getRequestId(){
         return RequestId;
     }

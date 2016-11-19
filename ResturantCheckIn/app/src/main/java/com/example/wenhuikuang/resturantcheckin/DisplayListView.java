@@ -18,8 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class DisplayListView extends AppCompatActivity {
-    String Json_string;
-    clientClass temp;
     restaurantAdapter restaurantAdapter;
     ListView listView;
     List<restaurant> mRestuarant;
