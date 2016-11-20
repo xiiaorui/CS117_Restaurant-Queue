@@ -10,11 +10,16 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class customer2 extends AppCompatActivity implements ClientListener{
+public class customer2 extends AppCompatActivity implements ClientListener {
     Button b1;
     Button b2;
     String json_string = null;
     Intent intent;
+
+    public customer2() {
+        clientClass.init(this, true);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

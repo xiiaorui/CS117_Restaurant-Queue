@@ -26,6 +26,11 @@ public class login extends AppCompatActivity implements ClientListener{
     Button button;
     URI uri = null;
     Intent intent;
+
+    public login() {
+        clientClass.init(this, false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
