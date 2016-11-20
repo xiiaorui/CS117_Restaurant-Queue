@@ -150,7 +150,11 @@ public class RestaurantManager {
 		// Successfully added party to queue.
 		// Notify restaurant.
 		restaurant.getServerContext().sendNotification(
-			NotificationFactory.enterQueue()
+			NotificationFactory.enterQueue(
+				party.getID(),
+				party.getName(),
+				party.getSize()
+			)
 		);
 		return status;
 	}
