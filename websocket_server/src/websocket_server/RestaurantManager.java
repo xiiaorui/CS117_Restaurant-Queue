@@ -253,6 +253,14 @@ public class RestaurantManager {
 		clientContext.lock();
 		try {
 			removedPartyID = restaurant.removeFromQueue(clientContext, true);
+			// We also remove client from mClientMap
+			mClientMapMutex.lock();
+			try {
+				mClientMap.remove(clientContext);
+			} finally {
+				mClientMapMutex.unlock();
+			}
+
 		} finally {
 			clientContext.unlock();
 		}
