@@ -16,13 +16,10 @@ public class customer2 extends AppCompatActivity implements ClientListener {
     String json_string = null;
     Intent intent;
 
-    public customer2() {
-        clientClass.init(this, true);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clientClass.init(this, true);
         setContentView(R.layout.activity_customer2);
 
         b1 = (Button)findViewById(R.id.button2);
