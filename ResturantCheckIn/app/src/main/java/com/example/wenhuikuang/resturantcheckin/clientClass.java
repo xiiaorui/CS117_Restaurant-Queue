@@ -1,9 +1,6 @@
 package com.example.wenhuikuang.resturantcheckin;
 
-import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -19,7 +16,7 @@ import org.json.JSONObject;
 
 public class clientClass extends WebSocketClient {
     private final String TAG = "check";
-    private static clientClass sclientclass;
+    private static clientClass sClient;
     private ClientListener clientListener;
     String Json_string = "ss";
     int RequestId = 0;
@@ -28,24 +25,26 @@ public class clientClass extends WebSocketClient {
         super(uri);
         this.clientListener = clientListener;
     }
-    public static clientClass getInstance(URI uri)
-    {
-        return sclientclass;
-    }
+
     @Override
     public void send(String message){
-        Log.d(TAG,message);
+        Log.d(TAG, "send() message=" + message);
         super.send(message);
     }
+
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
+        Log.d(TAG, "onOpen()");
         clientListener.onOpen();
     }
+
     public void setListener(ClientListener listener) {
         clientListener = listener;
     }
+
     @Override
     public void onMessage(String message) {
+        Log.d(TAG, "onMessage() message=" + message);
         JSONObject resp = null;
         try {
             resp = new JSONObject(message);
@@ -61,92 +60,86 @@ public class clientClass extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        Log.d(TAG, "onClose() code=" + code + " reason=" + reason + " remote=" + remote);
         clientListener.onClose(code, reason, remote);
     }
 
     @Override
     public void onError(Exception e) {
+        Log.d(TAG, "onError() e=" + e);
         clientListener.onError(e);
     }
+
     public void sendCustomerInfo(String name, int size, int restaurant_id) {
+        JSONObject Obj = newRequest("queue");
         try{
-            JSONObject Obj = new JSONObject();
             Obj.put("party_name",name);
             Obj.put("restaurant_id",restaurant_id);
-            Obj.put("action","queue");
             Obj.put("party_size",size);
-            Obj.put("id",RequestId);
-            RequestId += 2;
-            send(Obj.toString());
         }
         catch (JSONException e){
             e.printStackTrace();
         }
+        send(Obj.toString());
     }
-    public void getParties(){
+    public void getParties() {
+        JSONObject Obj = newRequest("get_parties");
         try {
-            JSONObject Obj = new JSONObject();
-            Obj.put("action", "get_parties");
-            Obj.put("id",RequestId);
             Obj.put("num_parties",10);
-            RequestId += 2;
-            send(Obj.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-    private int getRequestId(){
-        return RequestId;
-    }
-    public void getRestaurant(){
-        try {
-            JSONObject Obj = new JSONObject();
-            Obj.put("action", "get_restaurants");
-            Obj.put("id",RequestId);
-            RequestId += 2;
-            send(Obj.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    public void openRestaruant(int id){
-        try{
-            JSONObject Obj = new JSONObject();
-            Obj.put("restaurant_id",id);
-            Obj.put("action","open_restaurant");
-            Obj.put("id",RequestId);
-            RequestId += 2;
-            send(Obj.toString());
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-    }
-    public void createRestaruant(String name){
-        try {
-            JSONObject Obj = new JSONObject();
-            Obj.put("name", name);
-            Obj.put("action","create_restaurant");
-            Obj.put("id",RequestId);
-            RequestId += 2;
-            send(Obj.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        send(Obj.toString());
     }
 
-    public void leaveQueue(){
-        JSONObject object = new JSONObject();
+    public void getRestaurant(){
+        JSONObject Obj = newRequest("get_restaurants");
+        send(Obj.toString());
+    }
+
+    public void openRestaruant(int id) {
+        JSONObject Obj = newRequest("open_restaurant");
         try {
-            object.put("action","leave_queue");
-            object.put("id",RequestId);
-            RequestId += 2;
-            send(object.toString());
+            Obj.put("restaurant_id",id);
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+        send(Obj.toString());
+    }
+    public void createRestaruant(String name) {
+        JSONObject Obj = newRequest("create_restaurant");
+        try {
+            Obj.put("name", name);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        send(Obj.toString());
     }
+
+    public void leaveQueue() {
+        JSONObject object = newRequest("leave_queue");
+        send(object.toString());
+    }
+
+    private JSONObject newRequest(String action) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("id", getNewRequestID());
+            obj.put("action", action);
+        } catch (JSONException e) {
+            // Won't happen...
+        }
+        return obj;
+    }
+
+    private int getNewRequestID() {
+        int id = RequestId;
+        RequestId += 2;
+        return id;
+    }
+
     public static void init(ClientListener listener, boolean isCustomer) {
-        if (sclientclass != null) {
+        if (sClient != null) {
             // TODO properly handle this logic error
             throw new RuntimeException("");
         }
@@ -158,16 +151,16 @@ public class clientClass extends WebSocketClient {
         uriStr = uriStr + ":80";
         try {
             URI uri = new URI(uriStr);
-            sclientclass = new clientClass(uri, listener);
-            sclientclass.connect();
+            sClient = new clientClass(uri, listener);
+            sClient.connect();
         } catch (URISyntaxException e) {
             // TODO should never happen...
             e.printStackTrace();
         }
     }
-    public static clientClass get()
-    {
-        return sclientclass;
+
+    public static clientClass get() {
+        return sClient;
     }
 
 }
