@@ -61,7 +61,7 @@ public class Client extends WebSocketClient {
         } catch (JSONException e) {
             // invalid JSON object, which should never happen...
         }
-        mListener.onMessage(resp);
+        //mListener.onMessage(resp);
     }
 
     @Override
