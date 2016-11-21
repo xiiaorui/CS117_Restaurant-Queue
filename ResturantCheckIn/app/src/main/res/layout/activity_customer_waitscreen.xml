@@ -11,16 +11,6 @@
     tools:context="com.example.wenhuikuang.resturantcheckin.customerWaitscreen">
 
     <TextView
-        android:text="You are at position:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="35dp"
-        android:id="@+id/waitTime"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/waitTime"
@@ -29,22 +19,52 @@
         android:textSize="35dp"
         android:id="@+id/textView3" />
 
-    <Button
-        android:text="Refresh to see your position"
+    <TextView
+        android:text="You are at position:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:id="@+id/refresh"
-        android:layout_below="@+id/textView3"
+        android:textSize="35dp"
+        android:id="@+id/waitTime"
+        android:layout_marginTop="29dp"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/refresh"
+        android:id="@+id/button4"
+        android:layout_marginBottom="29dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Wait_time"
+        android:textSize="35dp"
+        android:layout_below="@+id/textView4"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:id="@+id/button4" />
+        android:layout_marginTop="32dp" />
+
+    <Button
+        android:text="Refresh to see your position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/refresh"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/Wait_time"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4" />
+
+    <TextView
+        android:text="Yout wait time:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textSize="35dp"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

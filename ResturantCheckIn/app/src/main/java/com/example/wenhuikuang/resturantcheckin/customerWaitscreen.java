@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class customerWaitscreen extends AppCompatActivity implements ClientListener {
 
-    TextView text,position;
+    TextView text,position,Wait_time;
     Button refresh,cancel;
     int wait_time, Position,id;
     @Override
@@ -26,9 +26,11 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
         Log.d("TAG",Integer.toString(Position));
         wait_time = getIntent().getExtras().getInt("wait_time");
         position = (TextView) findViewById(R.id.textView3);
+        Wait_time = (TextView) findViewById(R.id.Wait_time);
         refresh = (Button)findViewById(R.id.refresh);
         cancel = (Button)findViewById(R.id.button4);
         position.setText(Integer.toString(Position));
+        Wait_time.setText(Integer.toString(wait_time));
 
         id = getIntent().getExtras().getInt("id");
 

@@ -1,6 +1,7 @@
 package com.example.wenhuikuang.resturantcheckin;
 
 import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.List;
 public class customerAdapter extends BaseAdapter {
     private Context mContext;
     private List<customerInfo> customerInfos;
+    LayoutInflater layoutInflater;
     public customerAdapter(Context mContext, List<customerInfo> customerInfos)
     {
         this.mContext = mContext;
@@ -40,7 +42,7 @@ public class customerAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row;
         row = convertView;
-        LayoutInflater layoutInflater =(LayoutInflater)this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutInflater =(LayoutInflater)this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = layoutInflater.inflate(R.layout.row_layout_customer,parent,false);
         TextView tx_name = (TextView)row.findViewById(R.id.tx_name);
         TextView tx_size = (TextView)row.findViewById(R.id.tx_size);

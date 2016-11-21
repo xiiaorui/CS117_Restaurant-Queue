@@ -20,7 +20,6 @@ public class clientClass extends WebSocketClient {
     private final String TAG = "check";
     private static clientClass sClient;
     private ClientListener clientListener;
-    String Json_string = "ss";
     private Integer mRequestID = 0;
     private Map<Integer, MessageType> mRequestTypeMap;
 
