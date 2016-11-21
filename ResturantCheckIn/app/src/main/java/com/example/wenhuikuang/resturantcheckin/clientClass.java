@@ -3,6 +3,8 @@ package com.example.wenhuikuang.resturantcheckin;
 import android.util.Log;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import org.java_websocket.client.WebSocketClient;
@@ -19,11 +21,83 @@ public class clientClass extends WebSocketClient {
     private static clientClass sClient;
     private ClientListener clientListener;
     String Json_string = "ss";
-    int RequestId = 0;
+    private Integer mRequestID = 0;
+    private Map<Integer, MessageType> mRequestTypeMap;
 
     private clientClass(URI uri, ClientListener clientListener){
         super(uri);
         this.clientListener = clientListener;
+        mRequestTypeMap = new HashMap<>();
+    }
+
+    public synchronized void send(JSONObject obj) {
+        Integer id = null;
+        MessageType type = null;
+        if (obj.has("id")) {
+            try {
+                id = obj.getInt("id");
+            } catch (JSONException e) {
+            }
+        }
+        if (obj.has("action")) {
+            try {
+                String action = obj.getString("action");
+                type = getActionType(action);
+            } catch (JSONException e) {
+            }
+        }
+        if ((id != null) && (type != null)) {
+            mRequestTypeMap.put(id, type);
+        }
+        send(obj.toString());
+    }
+
+    // get the type of message returned by server
+    // resp should be any message/response from server
+    // returns null if unable to get type
+    // matches id with sent requests
+    public synchronized MessageType getType(JSONObject resp) {
+        if (resp.has("notification")) {
+            String notification = null;
+            try {
+                notification = resp.getString("notification");
+            } catch (JSONException e) {
+                // cannot happen...
+                e.printStackTrace();
+                return null;
+            }
+            for (MessageType t : MessageType.values()) {
+                if (!t.isAction() && t.getValue().equals(notification)) {
+                    return t;
+                }
+            }
+            return null;
+        } else {
+            Integer id = null;
+            if (!resp.has("id")) {
+                return null;
+            }
+            try {
+                id = resp.getInt("id");
+            } catch (JSONException e) {
+                // should not happen...
+                e.printStackTrace();
+                return null;
+            }
+            MessageType type = mRequestTypeMap.remove(id);
+            return type;
+        }
+    }
+
+    private MessageType getActionType(String action) {
+        MessageType type = null;
+        for (MessageType t : MessageType.values()) {
+            if (t.isAction() && (t.getValue().equals(action))) {
+                type = t;
+                break;
+            }
+        }
+        return type;
     }
 
     @Override
@@ -80,7 +154,7 @@ public class clientClass extends WebSocketClient {
         catch (JSONException e){
             e.printStackTrace();
         }
-        send(Obj.toString());
+        send(Obj);
     }
     public void getParties() {
         JSONObject Obj = newRequest("get_parties");
@@ -89,12 +163,12 @@ public class clientClass extends WebSocketClient {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        send(Obj.toString());
+        send(Obj);
     }
 
     public void getRestaurant(){
         JSONObject Obj = newRequest("get_restaurants");
-        send(Obj.toString());
+        send(Obj);
     }
 
     public void openRestaruant(int id) {
@@ -104,7 +178,7 @@ public class clientClass extends WebSocketClient {
         } catch(JSONException e) {
             e.printStackTrace();
         }
-        send(Obj.toString());
+        send(Obj);
     }
     public void createRestaruant(String name) {
         JSONObject Obj = newRequest("create_restaurant");
@@ -113,12 +187,12 @@ public class clientClass extends WebSocketClient {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        send(Obj.toString());
+        send(Obj);
     }
 
     public void leaveQueue() {
         JSONObject object = newRequest("leave_queue");
-        send(object.toString());
+        send(object);
     }
 
     private JSONObject newRequest(String action) {
@@ -133,8 +207,10 @@ public class clientClass extends WebSocketClient {
     }
 
     private int getNewRequestID() {
-        int id = RequestId;
-        RequestId += 2;
+        int id = mRequestID;
+        synchronized (mRequestID) {
+            mRequestID += 2;
+        }
         return id;
     }
 
