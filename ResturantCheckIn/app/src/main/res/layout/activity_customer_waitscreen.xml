@@ -25,26 +25,45 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/waitTime"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="10dp"
         android:textSize="35dp"
         android:id="@+id/textView3" />
-
-    <Button
-        android:text="Refresh to see your position"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:id="@+id/refresh"
-        android:layout_below="@+id/textView3"
-        android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/refresh"
+        android:id="@+id/button4"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:id="@+id/button4" />
+        android:layout_marginBottom="40dp" />
+
+    <Button
+        android:text="Refresh to see your position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/refresh"
+        android:layout_alignBottom="@+id/button4"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="65dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="90dp"
+        android:textSize="35dp"
+        android:id="@+id/textView7" />
+
+    <TextView
+        android:text="Wait Time:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:textSize="35dp"
+        android:layout_marginTop="38dp"
+        android:id="@+id/textView15" />
 
 </RelativeLayout>
