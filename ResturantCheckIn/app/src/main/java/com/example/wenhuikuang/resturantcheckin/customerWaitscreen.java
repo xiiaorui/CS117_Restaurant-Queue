@@ -1,6 +1,8 @@
 package com.example.wenhuikuang.resturantcheckin;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,12 +10,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class customerWaitscreen extends AppCompatActivity implements ClientListener {
-
+    private static final String TAG = "customerWaitscreen";
     TextView text,position,Wait_time;
     Button refresh,cancelButton;
     int wait_time, Position;
@@ -21,6 +24,7 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_waitscreen);
+        clientClass.get().setListener(this);
 
         Position = getIntent().getExtras().getInt("position");
         wait_time = getIntent().getExtras().getInt("wait_time");
@@ -59,7 +63,26 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
         if (messageType == MessageType.NOTIFY_CALL) {
 
         } else if (messageType == MessageType.NOTIFY_CLOSE) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(customerWaitscreen.this)
+                            .setTitle("Restaurant has closed.")
+                            .setMessage("Press OK to return to restaurant listing.")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(getApplicationContext(), customer2.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }).create().show();
 
+
+                }
+            });
         }
     }
 

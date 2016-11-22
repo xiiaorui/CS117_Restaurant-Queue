@@ -11,8 +11,8 @@ public enum MessageType {
     ACTION_QUEUE_STATUS(true, "queue_status"),
     NOTIFY_ENTER_QUEUE(false, "enter_queue"),
     NOTIFY_LEAVE_QUEUE(false, "leave_queue"),
-    NOTIFY_CALL(false, "close"),
-    NOTIFY_CLOSE(false, "call");
+    NOTIFY_CALL(false, "call"),
+    NOTIFY_CLOSE(false, "close");
 
     private final boolean mIsAction;
     private final String mValue;
