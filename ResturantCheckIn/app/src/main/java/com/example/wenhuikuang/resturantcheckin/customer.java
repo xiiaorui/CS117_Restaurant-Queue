@@ -81,7 +81,7 @@ public class customer extends AppCompatActivity implements ClientListener{
     public void onBackPressed()
     {
         super.onBackPressed();
-        startActivity(new Intent(getApplicationContext(), customer2.class));
+        startActivity(new Intent(getApplicationContext(), DisplayListView.class));
         finish();
 
     }

@@ -79,7 +79,8 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    // ?
+                                    finish();
+                                    System.exit(0);
                                 }
                             }).create().show();
                 }
