@@ -19,7 +19,10 @@ public class customer2 extends AppCompatActivity implements ClientListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        clientClass.init(this, true);
+        if (clientClass.get() == null)
+            clientClass.init(this, true);
+        else
+            clientClass.get().getRestaurant();
         setContentView(R.layout.activity_customer2);
 
         b1 = (Button)findViewById(R.id.button2);

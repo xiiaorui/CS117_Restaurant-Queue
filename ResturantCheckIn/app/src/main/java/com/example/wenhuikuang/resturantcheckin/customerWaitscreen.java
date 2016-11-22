@@ -15,32 +15,30 @@ import org.json.JSONObject;
 public class customerWaitscreen extends AppCompatActivity implements ClientListener {
 
     TextView text,position,Wait_time;
-    Button refresh,cancel;
-    int wait_time, Position,id;
+    Button refresh,cancelButton;
+    int wait_time, Position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_waitscreen);
 
         Position = getIntent().getExtras().getInt("position");
-        Log.d("TAG",Integer.toString(Position));
         wait_time = getIntent().getExtras().getInt("wait_time");
         position = (TextView) findViewById(R.id.textView3);
         Wait_time = (TextView) findViewById(R.id.Wait_time);
         refresh = (Button)findViewById(R.id.refresh);
-        cancel = (Button)findViewById(R.id.button4);
+        cancelButton = (Button)findViewById(R.id.customer_waitscreen_cancel_button);
         position.setText(Integer.toString(Position));
         Wait_time.setText(Integer.toString(wait_time));
 
-        id = getIntent().getExtras().getInt("id");
-
-        cancel.setOnClickListener(new View.OnClickListener() {
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clientClass.get().leaveQueue();
-                Intent intent = new Intent(getApplicationContext(),customer.class);
-                intent.putExtra("id",id);
+                Intent intent = new Intent(getApplicationContext(),customer2.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                 startActivity(intent);
+                finish();
             }
         });
     }
@@ -57,7 +55,12 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
 
     @Override
     public void onMessage(JSONObject resp) throws JSONException {
+        MessageType messageType = clientClass.get().getType(resp);
+        if (messageType == MessageType.NOTIFY_CALL) {
 
+        } else if (messageType == MessageType.NOTIFY_CLOSE) {
+
+        }
     }
 
     @Override
