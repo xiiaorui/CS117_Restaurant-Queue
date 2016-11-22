@@ -1,6 +1,8 @@
 package com.example.wenhuikuang.resturantcheckin;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -17,43 +19,40 @@ import java.util.List;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class DisplayListView extends AppCompatActivity {
+public class DisplayListView extends AppCompatActivity implements ClientListener {
     restaurantAdapter restaurantAdapter;
     ListView listView;
+    SwipeRefreshLayout swipeRefreshLayout;
     List<restaurant> mRestuarant;
-    String json_string;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_list_view);
-
-
+        
+        clientClass.init(this,true);
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.activity_display_list_view);
         listView = (ListView)findViewById(R.id.listview);
         mRestuarant = new ArrayList<>();
-
-        //get restaruant
-        int count = 0;
-        json_string = getIntent().getExtras().getString("data");
-
-
-
-        try {
-            JSONObject object = new JSONObject(json_string);
-            JSONArray array = object.getJSONArray("list");
-            while (count < array.length()) {
-                JSONArray JA = array.getJSONArray(count);
-                int id = (int) JA.get(0);
-                String name = (String)JA.get(1);
-//                Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
-                restaurant rest = new restaurant(name,id);
-                mRestuarant.add(rest);
-                count++;
+        
+        restaurantAdapter = new restaurantAdapter(getApplicationContext(),mRestuarant);
+        listView.setAdapter(restaurantAdapter);
+        
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                clientClass.get().getRestaurant();
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        refreshRestaurantInfo();
+                    }
+                },2000);
             }
-            restaurantAdapter = new restaurantAdapter(getApplicationContext(),mRestuarant);
-            listView.setAdapter(restaurantAdapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        });
+        //get restaruant
+        
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -65,7 +64,52 @@ public class DisplayListView extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
+        
+        
+    }
+    
+    @Override
+    public void onOpen() {
+        
+    }
+    
+    @Override
+    public void onClose(int code, String reason, boolean remote) {
+        
+    }
+    
+    @Override
+    public void onMessage(JSONObject resp) throws JSONException {
+        mRestuarant.clear();
+        int count = 0;
+        try {
+            JSONArray array = resp.getJSONArray("list");
+            while (count < array.length()) {
+                JSONArray JA = array.getJSONArray(count);
+                int id = (int) JA.get(0);
+                String name = (String)JA.get(1);
+                //                Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
+                restaurant rest = new restaurant(name,id);
+                mRestuarant.add(rest);
+                count++;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void onError(Exception e) {
+        
+    }
+    
+    private void refreshRestaurantInfo()
+    {
+        swipeRefreshLayout.setRefreshing(true);
+        //update the listview.
+        restaurantAdapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
+        restaurantAdapter = new restaurantAdapter(getApplicationContext(),mRestuarant);
+        listView.setAdapter(restaurantAdapter);
     }
 }
