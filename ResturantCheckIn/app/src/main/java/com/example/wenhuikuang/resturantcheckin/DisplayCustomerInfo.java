@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import android.widget.AdapterView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONException;
@@ -24,11 +25,11 @@ import org.json.JSONObject;
 
 public class DisplayCustomerInfo extends AppCompatActivity implements ClientListener {
     private final String TAG = "login";
-    JSONObject temp;
     private SwipeRefreshLayout swipeRefreshLayout;
     customerAdapter customerAdapter;
     ListView listView;
     List<customerInfo> customerInfos;
+    List<customerInfo> newCustomerInfos = null;
     int count = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +51,7 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(true);
-                (new Handler()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                        fetchCustomerInfo();
-                    }
-                },3000);
+                refreshCustomerInfo();
             }
         });
     }
@@ -74,25 +68,58 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
 
     @Override
     public void onMessage(JSONObject resp) throws JSONException {
-            temp = resp;
-//        try {
-//            JSONArray array = resp.getJSONArray("list");
-//            while (count < array.length()) {
-//                JSONArray JA = array.getJSONArray(count);
-//                int id = (int) JA.get(0);
-//                String name = (String)JA.get(1);
-//                int size = (int)JA.get(2);
-////                Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
-//                customerInfo customer = new customerInfo(id,name,size);
-//                Pair<String,customerInfo> pair = new Pair<>(Integer.toString(id),customer);
-//                customerInfos.add(pair);
-//                count++;
-//            }
-//            customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
-//            listView.setAdapter(customerAdapter);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        MessageType messageType = clientClass.get().getType(resp);
+        if (messageType == MessageType.NOTIFY_ENTER_QUEUE) {
+            copyNewCustomerInfos();
+            try {
+                int partyID = resp.getInt("party_id");
+                String partyName = resp.getString("party_name");
+                int partySize = resp.getInt("party_size");
+                customerInfo newCustomer = new customerInfo(partyID, partyName, partySize);
+                synchronized (newCustomerInfos) {
+                    newCustomerInfos.add(newCustomer);
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(
+                                getApplicationContext(),
+                                "New party",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+
+            } catch (JSONException e) {
+            }
+        } else if (messageType == MessageType.NOTIFY_LEAVE_QUEUE) {
+            copyNewCustomerInfos();
+            try {
+                int partyID = resp.getInt("party_id");
+                // remove party from customerInfos
+                synchronized (newCustomerInfos) {
+                    Iterator<customerInfo> iter = newCustomerInfos.iterator();
+                    while (iter.hasNext()) {
+                        customerInfo party = iter.next();
+                        if (party.getParty_id() == partyID) {
+                            iter.remove();
+                            break;
+                        }
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(
+                                getApplicationContext(),
+                                "Party has left",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+            } catch (JSONException e) {
+            }
+        }
     }
 
     @Override
@@ -100,34 +127,21 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
 
     }
 
-    private void fetchCustomerInfo(){
-        swipeRefreshLayout.setRefreshing(true);
-        if (temp == null)
-            return;
-        Log.d(TAG,temp.toString());
-        if (temp.has("notification")) {
-            try {
-                if (temp.getString("notification").equals("enter_queue")) {
-                    int id = temp.getInt("party_id");
-                    String name = temp.getString("party_name");
-                    int size = temp.getInt("party_size");
-                    customerInfo customer = new customerInfo(id, name, size);
-
-                    customerInfos.add(customer);
-                } else if (temp.getString("notification").equals("leave_queue")) {
-                    for (int i = 0; i < customerInfos.size(); i++) {
-                        if (customerInfos.get(i).getParty_id() == temp.getInt("party_id")) {
-                            customerInfos.remove(i);
-                        }
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+    private void copyNewCustomerInfos() {
+        if (newCustomerInfos == null) {
+            synchronized (customerInfos) {
+                newCustomerInfos = new ArrayList<>(customerInfos);
             }
-            customerAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void refreshCustomerInfo(){
+        if (newCustomerInfos == null)
+            return; // no changes
+        swipeRefreshLayout.setRefreshing(true);
+        customerAdapter.setList(newCustomerInfos);
+        newCustomerInfos = null;
+        customerAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
-        customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
-        listView.setAdapter(customerAdapter);
     }
 }

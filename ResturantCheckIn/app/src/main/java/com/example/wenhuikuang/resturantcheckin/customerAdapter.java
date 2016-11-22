@@ -52,4 +52,8 @@ public class customerAdapter extends BaseAdapter {
 
         return row;
     }
+
+    public void setList(List<customerInfo> newList) {
+        customerInfos = newList;
+    }
 }
