@@ -1,6 +1,7 @@
 package com.example.wenhuikuang.resturantcheckin;
 
 import android.content.Intent;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,13 +41,7 @@ public class login extends AppCompatActivity implements ClientListener{
                     ).show();
                 } else {
                     clientClass.get().createRestaruant(Name_rest);
-                    Toast.makeText(
-                            getApplicationContext(),
-                            Name_rest + " Created",
-                            Toast.LENGTH_LONG
-                    ).show();
-                    Intent intent = new Intent(getApplicationContext(), DisplayCustomerInfo.class);
-                    startActivity(intent);
+                    button.setEnabled(false);
                 }
             }
 
@@ -66,18 +61,31 @@ public class login extends AppCompatActivity implements ClientListener{
 
     @Override
     public void onMessage(JSONObject resp){
-        Log.d(TAG,resp.toString());
-        int id = 0;
-        if (!resp.isNull("restaurant_id")) {
+        MessageType messageType = clientClass.get().getType(resp);
+        if (messageType == MessageType.ACTION_CREATE_RESTAURANT) {
             try {
-                id = resp.getInt("restaurant_id");
+                int id = resp.getInt("restaurant_id");
                 clientClass.get().openRestaruant(id);
             } catch (JSONException e) {
-                e.printStackTrace();
+            }
+        } else if (messageType == MessageType.NOTIFY_LEAVE_QUEUE.ACTION_OPEN_RESTAURANT) {
+            try {
+                int errorCode = resp.getInt("error");
+                if (errorCode == 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(getApplicationContext(), DisplayCustomerInfo.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                } else {
+                    // error opening restaurant
+                }
+            } catch (JSONException e) {
             }
         }
-
-        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_LONG).show();
     }
 
     @Override
