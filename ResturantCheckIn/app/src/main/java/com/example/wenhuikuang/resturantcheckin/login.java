@@ -68,7 +68,7 @@ public class login extends AppCompatActivity implements ClientListener{
                 clientClass.get().openRestaruant(id);
             } catch (JSONException e) {
             }
-        } else if (messageType == MessageType.NOTIFY_LEAVE_QUEUE.ACTION_OPEN_RESTAURANT) {
+        } else if (messageType == MessageType.ACTION_OPEN_RESTAURANT) {
             try {
                 int errorCode = resp.getInt("error");
                 if (errorCode == 0) {

@@ -61,7 +61,22 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
     public void onMessage(JSONObject resp) throws JSONException {
         MessageType messageType = clientClass.get().getType(resp);
         if (messageType == MessageType.NOTIFY_CALL) {
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO update
+                    new AlertDialog.Builder(customerWaitscreen.this)
+                            .setTitle("Restaurant call.")
+                            .setMessage("Press OK to ... ?")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // ?
+                                }
+                            }).create().show();
+                }
+            });
         } else if (messageType == MessageType.NOTIFY_CLOSE) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -79,8 +94,6 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                                     finish();
                                 }
                             }).create().show();
-
-
                 }
             });
         }
