@@ -41,10 +41,6 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
         customerInfos = new ArrayList<>();
         clientClass.get().setListener(this);
 
-//        customerInfo customerInfo = new customerInfo(0,"Empty list",0);
-//        customerInfo customerInfo1 = new customerInfo(0,"Empty list",0);
-//        customerInfos.add(customerInfo);
-//        customerInfos.add(customerInfo1);
         customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
         listView.setAdapter(customerAdapter);
 
@@ -52,6 +48,31 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
             @Override
             public void onRefresh() {
                 refreshCustomerInfo();
+            }
+        });
+        
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(DisplayCustomerInfo.this);
+                mBuilder.setMessage("Do you want to notify this party?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        customerInfo customerInfo = (customerInfo)parent.getItemAtPosition(position);
+                        customerInfos.remove(customerInfo);
+                        int Id = customerInfo.getParty_id();
+                        clientClass.get().call_party(Id);
+                        customerAdapter.notifyDataSetChanged();
+                        customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
+                        listView.setAdapter(customerAdapter);
+                        
+                    }
+                })
+                .setNegativeButton("No",null)
+                .setCancelable(false);
+                AlertDialog alert = mBuilder.create();
+                alert.show();
             }
         });
     }

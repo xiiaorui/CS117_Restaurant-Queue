@@ -204,6 +204,16 @@ public class clientClass extends WebSocketClient {
         }
         return obj;
     }
+    public void call_party(int id){
+        JSONObject object = newRequest("call_party");
+        try {
+            object.put("party_id",id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        send(object);
+        
+    }
 
     private int getNewRequestID() {
         int id = mRequestID;
