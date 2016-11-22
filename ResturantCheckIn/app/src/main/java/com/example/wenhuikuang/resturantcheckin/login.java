@@ -22,12 +22,14 @@ public class login extends AppCompatActivity implements ClientListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        clientClass.init(this, false);
         setContentView(R.layout.activity_login);
 
         text = (EditText)findViewById(R.id.editText);
         button = (Button)findViewById(R.id.button);
-        clientClass.get().setListener(this);
+        if (clientClass.get() == null)
+            clientClass.init(this, false);
+        else
+            clientClass.get().setListener(this);
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {

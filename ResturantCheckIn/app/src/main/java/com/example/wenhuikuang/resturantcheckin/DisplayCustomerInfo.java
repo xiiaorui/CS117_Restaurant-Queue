@@ -49,30 +49,36 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshCustomerInfo();
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        refreshCustomerInfo();
+                    }
+                },2000);
             }
         });
-        
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(DisplayCustomerInfo.this);
                 mBuilder.setMessage("Do you want to notify this party?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        customerInfo customerInfo = (customerInfo)parent.getItemAtPosition(position);
-                        customerInfos.remove(customerInfo);
-                        int Id = customerInfo.getParty_id();
-                        clientClass.get().call_party(Id);
-                        customerAdapter.notifyDataSetChanged();
-                        customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
-                        listView.setAdapter(customerAdapter);
-                        
-                    }
-                })
-                .setNegativeButton("No",null)
-                .setCancelable(false);
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                customerInfo customerInfo = (customerInfo)parent.getItemAtPosition(position);
+                                customerInfos.remove(customerInfo);
+                                int Id = customerInfo.getParty_id();
+                                clientClass.get().call_party(Id);
+                                customerAdapter.notifyDataSetChanged();
+                                customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
+                                listView.setAdapter(customerAdapter);
+
+                            }
+                        })
+                        .setNegativeButton("No",null)
+                        .setCancelable(false);
                 AlertDialog alert = mBuilder.create();
                 alert.show();
             }

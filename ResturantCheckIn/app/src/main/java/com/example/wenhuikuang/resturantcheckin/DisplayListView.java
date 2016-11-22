@@ -28,8 +28,11 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_list_view);
-        
-        clientClass.init(this,true);
+
+        if (clientClass.get() == null)
+            clientClass.init(this,true);
+        else
+            clientClass.get().setListener(this);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.activity_display_list_view);
         listView = (ListView)findViewById(R.id.listview);
         mRestuarant = new ArrayList<>();
