@@ -108,8 +108,8 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
         swipeRefreshLayout.setRefreshing(true);
         //update the listview.
         restaurantAdapter.notifyDataSetChanged();
-        swipeRefreshLayout.setRefreshing(false);
         restaurantAdapter = new restaurantAdapter(getApplicationContext(),mRestuarant);
         listView.setAdapter(restaurantAdapter);
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

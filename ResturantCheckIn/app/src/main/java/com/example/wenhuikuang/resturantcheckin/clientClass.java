@@ -194,16 +194,6 @@ public class clientClass extends WebSocketClient {
         send(object);
     }
 
-    private JSONObject newRequest(String action) {
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put("id", getNewRequestID());
-            obj.put("action", action);
-        } catch (JSONException e) {
-            // Won't happen...
-        }
-        return obj;
-    }
     public void call_party(int id){
         JSONObject object = newRequest("call_party");
         try {
@@ -213,6 +203,21 @@ public class clientClass extends WebSocketClient {
         }
         send(object);
         
+    }
+    public void queue_status(){
+        JSONObject object = newRequest("queue_status");
+        send(object);
+    }
+
+    private JSONObject newRequest(String action) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("id", getNewRequestID());
+            obj.put("action", action);
+        } catch (JSONException e) {
+            // Won't happen...
+        }
+        return obj;
     }
 
     private int getNewRequestID() {

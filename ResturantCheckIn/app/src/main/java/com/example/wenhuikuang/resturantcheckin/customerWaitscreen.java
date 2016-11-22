@@ -17,9 +17,9 @@ import org.json.JSONObject;
 
 public class customerWaitscreen extends AppCompatActivity implements ClientListener {
     private static final String TAG = "customerWaitscreen";
-    TextView text,position,Wait_time;
+    TextView position,Wait_time;
     Button refresh,cancelButton;
-    int wait_time, Position;
+    int wait_time1, Position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,22 +27,29 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
         clientClass.get().setListener(this);
 
         Position = getIntent().getExtras().getInt("position");
-        wait_time = getIntent().getExtras().getInt("wait_time");
+        wait_time1 = getIntent().getExtras().getInt("wait_time");
         position = (TextView) findViewById(R.id.textView3);
-        Wait_time = (TextView) findViewById(R.id.Wait_time);
+        Wait_time = (TextView) findViewById(R.id.wait_time);
         refresh = (Button)findViewById(R.id.refresh);
         cancelButton = (Button)findViewById(R.id.customer_waitscreen_cancel_button);
         position.setText(Integer.toString(Position));
-        Wait_time.setText(Integer.toString(wait_time));
+        Wait_time.setText(Integer.toString(wait_time1));
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clientClass.get().leaveQueue();
-                Intent intent = new Intent(getApplicationContext(),customer2.class);
+                Intent intent = new Intent(getApplicationContext(),DisplayListView.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clientClass.get().queue_status();
             }
         });
     }
@@ -88,7 +95,7 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    Intent intent = new Intent(getApplicationContext(), customer2.class);
+                                    Intent intent = new Intent(getApplicationContext(), DisplayListView.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                                     startActivity(intent);
                                     finish();
@@ -96,6 +103,11 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                             }).create().show();
                 }
             });
+        }else{
+            wait_time1 = resp.getInt("wait_time");
+            Position = resp.getInt("position");
+            position.setText(Integer.toString(Position));
+            Wait_time.setText(Integer.toString(wait_time1));
         }
     }
 
