@@ -34,15 +34,6 @@
         android:hint="Size of Party" />
 
     <Button
-        android:text="check position"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/look_at"
-        android:layout_below="@+id/checkIn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp" />
-
-    <Button
         android:text="Check In"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

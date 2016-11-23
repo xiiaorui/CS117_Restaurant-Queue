@@ -63,7 +63,7 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
                 Toast.makeText(getApplicationContext(),rest.getName() + " selected", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(),customer.class);
                 int Id = rest.getId();
-                intent.putExtra("id",Id);
+                intent.putExtra("restaurant_id",Id);
                 startActivity(intent);
             }
         });
