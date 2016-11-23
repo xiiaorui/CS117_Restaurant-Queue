@@ -1,5 +1,6 @@
 package com.example.wenhuikuang.resturantcheckin;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -93,6 +94,11 @@ public class login extends AppCompatActivity implements ClientListener{
     @Override
     public void onError(Exception e) {
 
+    }
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
     }
 
 }

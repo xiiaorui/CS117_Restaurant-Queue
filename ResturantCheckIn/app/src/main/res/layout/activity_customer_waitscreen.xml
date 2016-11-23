@@ -11,50 +11,12 @@
     tools:context="com.example.wenhuikuang.resturantcheckin.customerWaitscreen">
 
     <TextView
-        android:text="You are at position:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:id="@+id/waitTime"
-        android:layout_marginTop="29dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/wait_time"
-        android:textSize="35dp"
-        android:layout_below="@+id/textView4"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="23dp"
         android:textSize="35dp"
         android:id="@+id/textView3"
         android:layout_below="@+id/waitTime"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:text="Yout wait time:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
-        android:textSize="30dp"
-        android:id="@+id/textView4"
-        android:layout_below="@+id/textView3"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:text="Refresh to see your position"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/refresh"
-        android:layout_marginTop="36dp"
-        android:layout_below="@+id/wait_time"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -65,5 +27,42 @@
         android:layout_below="@+id/refresh"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="27dp" />
+
+    <TextView
+        android:text="Estimated wait time:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="30dp"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wait_time"
+        android:textSize="35dp"
+        android:layout_marginTop="19dp"
+        android:layout_below="@+id/textView4"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Refresh to see your position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/refresh"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/wait_time"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="You are at position:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:id="@+id/waitTime"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
