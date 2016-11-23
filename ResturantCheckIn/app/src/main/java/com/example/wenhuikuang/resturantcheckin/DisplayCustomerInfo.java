@@ -128,7 +128,7 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
                     public void run() {
                         Toast.makeText(
                                 getApplicationContext(),
-                                "New party",
+                                "New party joins",
                                 Toast.LENGTH_SHORT
                         ).show();
                     }
@@ -187,5 +187,22 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
         newCustomerInfos = null;
         customerAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    public void onBackPressed() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(DisplayCustomerInfo.this);
+        mBuilder.setMessage("Do you want to close your restaurant check in list?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        moveTaskToBack(true);
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
+                    }
+                })
+                .setNegativeButton("No",null)
+                .setCancelable(false);
+        AlertDialog alert = mBuilder.create();
+        alert.show();
     }
 }

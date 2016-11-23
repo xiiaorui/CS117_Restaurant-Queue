@@ -43,7 +43,7 @@ public class login extends AppCompatActivity implements ClientListener{
                     ).show();
                 } else {
                     clientClass.get().createRestaruant(Name_rest);
-                    button.setEnabled(false);
+//                    button.setEnabled(false);
                 }
             }
 

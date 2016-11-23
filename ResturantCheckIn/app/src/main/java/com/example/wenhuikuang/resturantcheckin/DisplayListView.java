@@ -85,19 +85,21 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
     public void onMessage(JSONObject resp) throws JSONException {
         mRestuarant.clear();
         int count = 0;
-        try {
-            JSONArray array = resp.getJSONArray("list");
-            while (count < array.length()) {
-                JSONArray JA = array.getJSONArray(count);
-                int id = (int) JA.get(0);
-                String name = (String)JA.get(1);
-                //                Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
-                restaurant rest = new restaurant(name,id);
-                mRestuarant.add(rest);
-                count++;
+        if (resp.has("list")) {
+            try {
+                JSONArray array = resp.getJSONArray("list");
+                while (count < array.length()) {
+                    JSONArray JA = array.getJSONArray(count);
+                    int id = (int) JA.get(0);
+                    String name = (String) JA.get(1);
+                    //                Toast.makeText(getApplicationContext(),name, Toast.LENGTH_LONG).show();
+                    restaurant rest = new restaurant(name, id);
+                    mRestuarant.add(rest);
+                    count++;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
     
@@ -131,5 +133,22 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
         restaurantAdapter = new restaurantAdapter(getApplicationContext(),mRestuarant);
         listView.setAdapter(restaurantAdapter);
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    public void onBackPressed() {
+        android.app.AlertDialog.Builder mBuilder = new android.app.AlertDialog.Builder(DisplayListView.this);
+        mBuilder.setMessage("Do you want to exit the app?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        moveTaskToBack(true);
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
+                    }
+                })
+                .setNegativeButton("No",null)
+                .setCancelable(false);
+        android.app.AlertDialog alert = mBuilder.create();
+        alert.show();
     }
 }
