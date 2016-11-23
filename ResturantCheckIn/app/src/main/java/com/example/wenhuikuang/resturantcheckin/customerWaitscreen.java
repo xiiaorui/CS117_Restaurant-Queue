@@ -33,7 +33,7 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
         refresh = (Button)findViewById(R.id.refresh);
         cancelButton = (Button)findViewById(R.id.customer_waitscreen_cancel_button);
         position.setText(Integer.toString(Position));
-        Wait_time.setText(Integer.toString(wait_time1));
+        Wait_time.setText(getWaitTimeString(wait_time1));
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +111,7 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                 @Override
                 public void run() {
                     position.setText(Integer.toString(Position));
-                    Wait_time.setText(Integer.toString(wait_time1));
+                    Wait_time.setText(getWaitTimeString(wait_time1));
                 }
             });
         }
@@ -120,5 +120,12 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
     @Override
     public void onError(Exception e) {
 
+    }
+
+    private String getWaitTimeString(int time) {
+        if (time == 0)
+            return "unknown";
+        else
+            return Integer.toString(time);
     }
 }
