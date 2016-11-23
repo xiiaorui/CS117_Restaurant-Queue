@@ -1,8 +1,10 @@
 package com.example.wenhuikuang.resturantcheckin;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -16,8 +18,6 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class DisplayListView extends AppCompatActivity implements ClientListener {
     restaurantAdapter restaurantAdapter;
@@ -103,7 +103,24 @@ public class DisplayListView extends AppCompatActivity implements ClientListener
     
     @Override
     public void onError(Exception e) {
-        
+        if (!clientClass.get().isConnected()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(DisplayListView.this)
+                            .setTitle("Unable to connect to server.")
+                            .setMessage("Press OK to exit.")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                    System.exit(0);
+                                }
+                            }).create().show();
+                }
+            });
+        }
     }
     
     private void refreshRestaurantInfo()

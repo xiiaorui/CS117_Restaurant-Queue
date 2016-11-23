@@ -22,6 +22,7 @@ public class clientClass extends WebSocketClient {
     private ClientListener clientListener;
     private Integer mRequestID = 0;
     private Map<Integer, MessageType> mRequestTypeMap;
+    private boolean mConnected = false;
 
     private clientClass(URI uri, ClientListener clientListener){
         super(uri);
@@ -108,11 +109,16 @@ public class clientClass extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         Log.d(TAG, "onOpen()");
+        mConnected = true;
         clientListener.onOpen();
     }
 
     public void setListener(ClientListener listener) {
         clientListener = listener;
+    }
+
+    public boolean isConnected() {
+        return mConnected;
     }
 
     @Override
