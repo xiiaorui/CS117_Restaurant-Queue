@@ -104,11 +104,16 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                             }).create().show();
                 }
             });
-        }else{
+        } else if (messageType == MessageType.ACTION_QUEUE_STATUS) {
             wait_time1 = resp.getInt("wait_time");
             Position = resp.getInt("position");
-            position.setText(Integer.toString(Position));
-            Wait_time.setText(Integer.toString(wait_time1));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    position.setText(Integer.toString(Position));
+                    Wait_time.setText(Integer.toString(wait_time1));
+                }
+            });
         }
     }
 
