@@ -32,7 +32,7 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
     ListView listView;
     List<customerInfo> customerInfos;
     List<customerInfo> newCustomerInfos = null;
-    int count = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +92,22 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new android.support.v7.app.AlertDialog.Builder(DisplayCustomerInfo.this)
+                        .setTitle("Lost connection with server.")
+                        .setMessage("Press OK to exit.")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+                                System.exit(0);
+                            }
+                        }).create().show();
+            }
+        });
     }
 
     @Override

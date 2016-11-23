@@ -74,7 +74,7 @@ public class customerWaitscreen extends AppCompatActivity implements ClientListe
                     // TODO update
                     new AlertDialog.Builder(customerWaitscreen.this)
                             .setTitle("Restaurant call.")
-                            .setMessage("Press OK to ... ?")
+                            .setMessage("Press OK to exit.")
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
