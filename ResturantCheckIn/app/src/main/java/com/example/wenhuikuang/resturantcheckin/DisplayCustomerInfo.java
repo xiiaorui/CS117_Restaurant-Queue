@@ -68,13 +68,22 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 customerInfo customerInfo = (customerInfo)parent.getItemAtPosition(position);
-                                customerInfos.remove(customerInfo);
-                                int Id = customerInfo.getParty_id();
-                                clientClass.get().call_party(Id);
+                                customerInfos.remove(customerInfo);// remove from current list view
+                                int partyID = customerInfo.getParty_id();
+                                // include change in next refresh
+                                copyNewCustomerInfos();
+                                synchronized (newCustomerInfos) {
+                                    Iterator<customerInfo> iter = newCustomerInfos.iterator();
+                                    while (iter.hasNext()) {
+                                        customerInfo party = iter.next();
+                                        if (party.getParty_id() == partyID) {
+                                            iter.remove();
+                                            break;
+                                        }
+                                    }
+                                }
+                                clientClass.get().call_party(partyID);
                                 customerAdapter.notifyDataSetChanged();
-                                customerAdapter = new customerAdapter(getApplicationContext(),customerInfos);
-                                listView.setAdapter(customerAdapter);
-
                             }
                         })
                         .setNegativeButton("No",null)
@@ -180,13 +189,17 @@ public class DisplayCustomerInfo extends AppCompatActivity implements ClientList
     }
 
     private void refreshCustomerInfo(){
+        if (swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
         if (newCustomerInfos == null)
             return; // no changes
-        swipeRefreshLayout.setRefreshing(true);
+        // set updated customer infos to current customer infos
+        customerInfos = newCustomerInfos;
+        // set list to updated customer infos
         customerAdapter.setList(newCustomerInfos);
+        // changes included, so new customer infos will be null
         newCustomerInfos = null;
         customerAdapter.notifyDataSetChanged();
-        swipeRefreshLayout.setRefreshing(false);
     }
 
     public void onBackPressed() {
