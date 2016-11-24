@@ -55,25 +55,5 @@ public class restaurantAdapter extends BaseAdapter {
         tx_name.setText(mRestaruant.get(position).getName());
 
         return row;
-//        View row;
-//        row = convertView;
-//        RestaurantHolder restaurantHolder;
-//        if (row == null)
-//        {
-//            LayoutInflater layoutInflater =(LayoutInflater)this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            row = layoutInflater.inflate(R.layout.row_layout,parent,false);
-//            restaurantHolder = new RestaurantHolder();
-//            restaurantHolder.tx_name = (TextView)row.findViewById(R.id.tx_name);
-//        }
-//        else{
-//            restaurantHolder = (RestaurantHolder)row.getTag();
-//        }
-//        restaurant rest = (restaurant)this.getItem(position);
-//        restaurantHolder.tx_name.setText(rest.getName());
-//        return row;
-    }
-    static class RestaurantHolder{
-        TextView tx_name;
-
     }
 }
