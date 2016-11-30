@@ -54,10 +54,10 @@ public class Context {
 			throw new RuntimeException("UserType cannot be set to null");
 		switch (type) {
 		case CUSTOMER:
-			mHandler = new ClientMessageHandler(this);
+			mHandler = new CustomerMessageHandler(this);
 			break;
 		case RESTAURANT:
-			mHandler = new ServerMessageHandler(this);
+			mHandler = new RestaurantMessageHandler(this);
 			mDatabaseConnection = DatabaseClient.getNewServerConnection();
 			break;
 		}

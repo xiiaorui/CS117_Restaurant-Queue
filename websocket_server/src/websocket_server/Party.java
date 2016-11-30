@@ -2,25 +2,25 @@ package websocket_server;
 
 public class Party {
 
-	private Context mClientContext;
+	private Context mCustomerContext;
 	private String mName;
 	private int mSize;
 	// data members below this line are assigned and used only by restaurant
 	private int mID = -1;
 	private long mTimestamp = 0;
 
-	public Party(Context clientContext, String name, int size) {
-		mClientContext = clientContext;
+	public Party(Context customerContext, String name, int size) {
+		mCustomerContext = customerContext;
 		mName = name;
 		mSize = size;
 	}
 
-	public Context getClientContext() {
-		return mClientContext;
+	public Context getCustomerContext() {
+		return mCustomerContext;
 	}
 
-	public void clearClientContext() {
-		mClientContext = null;
+	public void clearCustomerContext() {
+		mCustomerContext = null;
 	}
 
 	public int getID() {

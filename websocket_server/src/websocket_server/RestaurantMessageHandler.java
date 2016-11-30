@@ -9,13 +9,13 @@ import org.json.JSONObject;
 
 import websocket_server.schema.RestaurantsRow;
 
-public class ServerMessageHandler implements MessageHandler {
+public class RestaurantMessageHandler implements MessageHandler {
 
-	private static final Logger sLogger = Logger.getLogger(ServerMessageHandler.class.getName());
+	private static final Logger sLogger = Logger.getLogger(RestaurantMessageHandler.class.getName());
 	private final Context mContext;
 	private int mID = -1;	// restaurant ID
 
-	public ServerMessageHandler(Context context) {
+	public RestaurantMessageHandler(Context context) {
 		mContext = context;
 	}
 

@@ -2,11 +2,11 @@ package websocket_server;
 
 import org.json.JSONObject;
 
-public class ClientMessageHandler implements MessageHandler {
+public class CustomerMessageHandler implements MessageHandler {
 
 	private final Context mContext;
 
-	public ClientMessageHandler(Context context) {
+	public CustomerMessageHandler(Context context) {
 		mContext = context;
 	}
 

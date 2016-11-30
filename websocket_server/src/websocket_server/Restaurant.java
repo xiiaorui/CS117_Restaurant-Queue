@@ -9,7 +9,7 @@ import java.util.Queue;
 
 public class Restaurant {
 
-	private Context mServerContext;
+	private Context mRestaurantContext;
 	private final String mName;
 	private Queue<Party> mQueue;
 	// Maps a client Context to its party
@@ -20,8 +20,8 @@ public class Restaurant {
 	private int mPartyID = 0;
 	private boolean mIsClosed = false;
 
-	public Restaurant(Context serverContext, String name) {
-		mServerContext = serverContext;
+	public Restaurant(Context restaurantContext, String name) {
+		mRestaurantContext = restaurantContext;
 		mName = name;
 		mQueue = new ArrayDeque<Party>();
 		mContextMap = new HashMap<>();
@@ -32,20 +32,20 @@ public class Restaurant {
 		return mName;
 	}
 
-	public Context getServerContext() {
-		return mServerContext;
+	public Context getRestaurantContext() {
+		return mRestaurantContext;
 	}
 
 	public synchronized QueueStatus addParty(Party party) {
 		QueueStatus status = null;
 		if (!mIsClosed) {
-			if (party.getClientContext() == null) {
+			if (party.getCustomerContext() == null) {
 				// A logic error occurred somewhere...
 				throw new RuntimeException("party's context cannot be null");
 			}
 			party.setID(getNewPartyID());
 			party.setTimestamp(getTimestamp());
-			mContextMap.put(party.getClientContext(), party);
+			mContextMap.put(party.getCustomerContext(), party);
 			mQueue.add(party);
 			// get status
 			status = new QueueStatus(mQueue.size(), mEstimator.getWaitTime(1));
@@ -68,19 +68,19 @@ public class Restaurant {
 		return null;
 	}
 
-	// Returns the party ID of the party associated with clientContext
+	// Returns the party ID of the party associated with custContext
 	// Returns -1 if there was no party or restaurant closed
 	// fromCall specifies if this call was made due to a call by restaurant.
-	public synchronized int removeFromQueue(Context clientContext, boolean fromCall) {
+	public synchronized int removeFromQueue(Context custContext, boolean fromCall) {
 		if (mIsClosed)
 			return -1;
-		Party party = mContextMap.remove(clientContext);
+		Party party = mContextMap.remove(custContext);
 		if (party == null) {
 			// The client was not in the queue.
 			return -1;
 		}
 		// clear party's context
-		party.clearClientContext();
+		party.clearCustomerContext();
 		// update queue
 		mQueue.remove(party);
 		if (fromCall) {
@@ -100,10 +100,10 @@ public class Restaurant {
 		return front;
 	}
 
-	public synchronized QueueStatus getStatus(Context clientContext) {
-		Party party = mContextMap.get(clientContext);
+	public synchronized QueueStatus getStatus(Context custContext) {
+		Party party = mContextMap.get(custContext);
 		if (party == null) {
-			// Client is not in queue.
+			// Customer is not in queue.
 			return null;
 		}
 		// Find position.
@@ -127,7 +127,7 @@ public class Restaurant {
 		if (!mIsClosed) {
 			throw new RuntimeException("cannot call clear() when still open");
 		}
-		mServerContext = null;
+		mRestaurantContext = null;
 		mQueue = null;
 		mContextMap = null;
 	}
