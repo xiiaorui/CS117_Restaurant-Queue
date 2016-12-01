@@ -12,7 +12,7 @@ public class Restaurant {
 	private Context mRestaurantContext;
 	private final String mName;
 	private Queue<Party> mQueue;
-	// Maps a client Context to its party
+	// Maps a customer Context to its party
 	private Map<Context, Party> mContextMap;
 	private final WaitTimeEstimator mEstimator;
 	// mPartyID is used to assign a unique (per restaurant) ID to each party
@@ -76,7 +76,7 @@ public class Restaurant {
 			return -1;
 		Party party = mContextMap.remove(custContext);
 		if (party == null) {
-			// The client was not in the queue.
+			// The customer was not in the queue.
 			return -1;
 		}
 		// clear party's context
