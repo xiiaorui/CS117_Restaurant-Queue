@@ -44,7 +44,6 @@ public class Server extends WebSocketServer {
 	@Override
 	public void onError(WebSocket arg0, Exception arg1) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -64,7 +63,9 @@ public class Server extends WebSocketServer {
 		}
 		Context context = getContext(conn);
 		resp = context.getHandler().onMessage(messageJSON);
-		conn.send(resp.toString());
+		if (resp != null) {
+			conn.send(resp.toString());
+		}
 	}
 
 	@Override
@@ -87,6 +88,8 @@ public class Server extends WebSocketServer {
 		}
 		if (type == null) {
 			// invalid resource descriptor, close connection
+			conn.close();
+			return;
 		}
 
 		// make new Context for the connection
