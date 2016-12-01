@@ -18,7 +18,7 @@ public class WaitTimeEstimator {
 	}
 
 	public int add(Party party) {
-		long timestamp = System.currentTimeMillis() / 1000L;
+		long timestamp = (System.currentTimeMillis() / 1000L);
 		Node newNode = new Node();
 		newNode.mTimestamp = timestamp;
 		newNode.mDuration = (int) (timestamp - party.getTimestamp());
@@ -48,12 +48,16 @@ public class WaitTimeEstimator {
 	}
 
 	private void updateStdDev() {
-		double mean = ((double) mDurationAcc) / ((double) mQueue.size());
-		double diff2acc = 0;
-		for (Node node : mQueue) {
-			diff2acc += Math.pow(node.mDuration - mean, 2);
+		if (mQueue.isEmpty()) {
+			mStdDev = 0;
+		} else {
+			double mean = ((double) mDurationAcc) / ((double) mQueue.size());
+			double diff2acc = 0;
+			for (Node node : mQueue) {
+				diff2acc += Math.pow(node.mDuration - mean, 2);
+			}
+			mStdDev = Math.sqrt(diff2acc / mQueue.size());
 		}
-		mStdDev = Math.sqrt(diff2acc / mQueue.size());
 	}
 
 	private class Node {
